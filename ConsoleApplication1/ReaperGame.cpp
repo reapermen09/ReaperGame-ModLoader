@@ -168,7 +168,7 @@ void DisplayAchievements()
 
 void AchievementReachedCheck(int money, int points)
 {
-    
+
     if (money >= 100 && !money100)
     {
         //cout << "You got the Novice achievement! (100+ money)\n";
@@ -660,7 +660,7 @@ void Prison()
     inprison = true;
     string options;
     cout << "\nYou are in prison for not paying your child support" << endl;
-    Prisonlist:
+Prisonlist:
     cout << "\nYour options are:\n";
     cout << "1. Math (Medium but free)\n\n";
     cout << "2. Bribery (Easy but costs money)\n\n";
@@ -702,72 +702,72 @@ void Prison()
             goto Prisonlist;
         }
     }
-        else if (options == "Prisonbreak")
+    else if (options == "Prisonbreak")
+    {
+        uniform_int_distribution<int> dist(1, 100);
+        random_device rd;
+        mt19937 gen(rd());
+        int chance = dist(gen);
+        if (chance <= 10)
         {
-            uniform_int_distribution<int> dist(1, 100);
-            random_device rd;
-            mt19937 gen(rd());
-            int chance = dist(gen);
-            if (chance <= 10)
-            {
+            OutOfPrison();
+        }
+        else
+        {
+            cout << "You failed to escape...";
+            goto Prisonlist;
+        }
+
+    }
+    else if (options == "Math")
+    {
+        random_device rd;
+        mt19937 gen(rd());
+        uniform_int_distribution<int> dist(100, 1000);
+
+        while (true) {
+            int randomNum1 = dist(gen);
+            int randomNum2 = dist(gen);
+            int correctAnswer;
+            string operation;
+
+            cout << "Choose operation (add/subtract) numbers are generated randon from 100 to 1000: ";
+            cin >> operation;
+
+            if (operation == "add") {
+                cout << "What is " << randomNum1 << " + " << randomNum2 << "? ";
+                correctAnswer = randomNum1 + randomNum2;
+            }
+            else if (operation == "subtract") {
+                cout << "What is " << randomNum1 << " - " << randomNum2 << "? ";
+                correctAnswer = randomNum1 - randomNum2;
+            }
+            else {
+                cout << "Invalid operation. Please choose 'add' or 'subtract'.\n";
+                continue;
+            }
+
+            int playerAnswer = getValidInt();
+            if (playerAnswer == correctAnswer) {
                 OutOfPrison();
+                break;
             }
-            else
-            {
-                cout << "You failed to escape...";
-                goto Prisonlist;
+            else {
+                cout << "Wrong answer! Would you like to try again (y/n)? ";
+                string retry;
+                cin >> retry;
+                if (retry != "y" || retry != "Y") break;
             }
-
         }
-        else if (options == "Math")
+    }
+    else {
+        if (options != "Options")
         {
-            random_device rd;
-            mt19937 gen(rd());
-            uniform_int_distribution<int> dist(100, 1000);
-
-            while (true) {
-                int randomNum1 = dist(gen);
-                int randomNum2 = dist(gen);
-                int correctAnswer;
-                string operation;
-
-                cout << "Choose operation (add/subtract) numbers are generated randon from 100 to 1000: ";
-                cin >> operation;
-
-                if (operation == "add") {
-                    cout << "What is " << randomNum1 << " + " << randomNum2 << "? ";
-                    correctAnswer = randomNum1 + randomNum2;
-                }
-                else if (operation == "subtract") {
-                    cout << "What is " << randomNum1 << " - " << randomNum2 << "? ";
-                    correctAnswer = randomNum1 - randomNum2;
-                }
-                else {
-                    cout << "Invalid operation. Please choose 'add' or 'subtract'.\n";
-                    continue;
-                }
-
-                int playerAnswer = getValidInt();
-                if (playerAnswer == correctAnswer) {
-                    OutOfPrison();
-                    break;
-                }
-                else {
-                    cout << "Wrong answer! Would you like to try again (y/n)? ";
-                    string retry;
-                    cin >> retry;
-                    if (retry != "y" || retry != "Y") break;
-                }
-            }
+            cout << "Invalid response\n";
+            goto Prisonlist;
         }
-        else {
-            if (options != "Options")
-            {
-                cout << "Invalid response\n";
-                goto Prisonlist;
-            }
-        }   
-    
+    }
+
 }
 
 int main() {
