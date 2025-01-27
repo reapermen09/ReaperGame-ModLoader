@@ -549,7 +549,6 @@ void HandleTaxes(int& money, int& taxamount) {
                 }
                 else if (payment <= 0) {
                     cout << "Invalid input. Please enter a positive number.\n";
-                    break;
                 }
                 else {
                     money -= payment;
@@ -558,7 +557,7 @@ void HandleTaxes(int& money, int& taxamount) {
 
                     if (taxamount <= 0) {
                         cout << "You have fully paid your taxes.\n";
-                        break;
+                        return;
                     }
 
                     cout << "Remaining taxes: " << taxamount << ". Would you like to continue paying? (y/n): ";
@@ -566,7 +565,7 @@ void HandleTaxes(int& money, int& taxamount) {
 
                     if (response != "y" && response != "Y") {
                         cout << "You chose not to pay any more taxes. Remaining taxes: " << taxamount << ".\n";
-                        break;
+                        return;
                     }
                 }
             }
@@ -582,7 +581,7 @@ void HandleTaxes(int& money, int& taxamount) {
     }
 }
 
-void ChildSupport(int& money, int& childsupportamount) 
+void ChildSupport(int& money, int& childsupportamount)
 {
     if (childsupportamount <= 0) {
         cout << "You don't owe child support.\n";
@@ -592,31 +591,35 @@ void ChildSupport(int& money, int& childsupportamount)
     string response;
 
     do {
-        cout << "You owe: " << childsupportamount << " in childsupport." << endl;
+        cout << "You owe: " << childsupportamount << " in child support." << endl;
         cout << "Would you like to pay child support (y/n)? ";
         cin >> response;
 
         if (response == "y" || response == "Y") {
-            while (childsupportamount > 0)
-            {
-                if (money >= childsupportamount)
-                {
-                    money -= childsupportamount;
-                }
-                else
-                {
-                    cout << "You do not have enough money to pay for child support pay soon... or prison...";
-                }
+            if (money >= childsupportamount) {
+                money -= childsupportamount;
+                childsupportamount = 0;
+                cout << "Child support fully paid. Remaining money: " << money << "\n";
+            }
+            else {
+                cout << "You do not have enough money to pay the full child support.\n";
+                cout << "Paying what you can: " << money << "\n";
+                childsupportamount -= money;
+                money = 0;
+                cout << "Remaining child support amount: " << childsupportamount << "\n";
             }
         }
         else if (response != "n" && response != "N") {
             cout << "Invalid input. Please respond with 'y' or 'n'.\n";
         }
 
-    } while (response != "n" && response != "N");
+    } while (response != "n" && response != "N" && childsupportamount > 0);
 
-    if (response == "n" || response == "N") {
-        cout << "You chose not to pay child support. You will have to pay eventually...\n";
+    if (childsupportamount > 0) {
+        cout << "You still owe " << childsupportamount << " in child support. Please pay soon.\n";
+    }
+    else {
+        cout << "Child support is fully paid. Thank you!\n";
     }
 }
 
