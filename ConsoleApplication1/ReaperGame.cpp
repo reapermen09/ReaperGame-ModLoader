@@ -5,7 +5,11 @@
 #include <limits>
 #include <cstdlib>
 #include <ctime>
+#include <stdio.h>
 #include <windows.h>
+#include <C:\cstuff\bass24\c\bass.h>
+#pragma comment(lib, "winmm.lib")
+#pragma comment(lib, "C:\\cstuff\\bass24\\c\\x64\\bass.lib") //reaper leak fr (also lazy tbh)
 
 using namespace std;
 
@@ -15,15 +19,64 @@ int taxamount = 0;
 int csamount = 0;
 int fontSize;
 bool inprison = false;
-bool secretonefound;
-bool secrettwofound;
-bool begging;
+bool secretonefound = false;
+bool secrettwofound = false;
+bool begging = false;
 int money = 10;
 int points = 0;
 string folderPath = "C:\\ReaperGame\\SaveData";
 string saveFilePath = folderPath + "\\game_save.txt";
 string settingsFilePath = folderPath + "\\settings.txt";
 string achievementsFilePath = folderPath + "\\achievements.txt";
+
+void AssetsFolder() {
+    const char* folderPath = "C:\\ReaperGame\\Assets";
+
+    DWORD fileAttr = GetFileAttributesA(folderPath);
+
+    if (fileAttr == INVALID_FILE_ATTRIBUTES || !(fileAttr & FILE_ATTRIBUTE_DIRECTORY)) {
+        CreateDirectoryA(folderPath, NULL);
+    }
+}
+
+bool FileExists(const char* filename) {
+    FILE* file;
+    if (fopen_s(&file, filename, "r") == 0) {
+        fclose(file);
+        return true;
+    }
+    return false;
+}
+
+void MP3Silently(const char* mp3File, bool playstop) {
+    if (!FileExists(mp3File)) {
+        return;
+    }
+
+    if (playstop) {
+        if (!BASS_Init(-1, 44100, 0, 0, NULL)) {
+            return;
+        }
+
+        HSTREAM stream = BASS_StreamCreateFile(FALSE, mp3File, 0, 0, BASS_STREAM_AUTOFREE);
+        if (!stream) {
+            BASS_Free();
+            return;
+        }
+
+        if (!BASS_ChannelPlay(stream, FALSE)) {
+            BASS_Free();
+            return;
+        }
+    }
+    else {
+        HSTREAM stream = BASS_StreamCreateFile(FALSE, mp3File, 0, 0, BASS_STREAM_AUTOFREE);
+        if (stream) {
+            BASS_ChannelStop(stream);
+            BASS_Free();
+        }
+    }
+}
 
 void SetFontSize(int size) {
     if (size < 1 || size > 3) {
@@ -74,9 +127,13 @@ bool money100000 = false;
 bool money1000000 = false;
 
 bool firstTransaction = false;
+
 bool foundreaper = false;
 bool insultreaper = false;
 bool begreaper = false;
+
+bool wentToPrison = false;
+bool escapedPrison = false;
 
 bool points100 = false;
 bool points1000 = false;
@@ -84,11 +141,13 @@ bool points10000 = false;
 bool points100000 = false;
 bool points1000000 = false;
 
-void SaveAchievements()
-{
+//checking stuff bruh
+bool donotcheck = false;
+bool donotcheck2 = false;
+
+void SaveAchievements() {
     ofstream achievementsFile(achievementsFilePath);
-    if (achievementsFile.is_open())
-    {
+    if (achievementsFile.is_open()) {
         achievementsFile << money100 << "\n";
         achievementsFile << money1000 << "\n";
         achievementsFile << money10000 << "\n";
@@ -96,6 +155,7 @@ void SaveAchievements()
         achievementsFile << money1000000 << "\n";
 
         achievementsFile << firstTransaction << "\n";
+
         achievementsFile << foundreaper << "\n";
         achievementsFile << insultreaper << "\n";
         achievementsFile << begreaper << "\n";
@@ -106,19 +166,22 @@ void SaveAchievements()
         achievementsFile << points100000 << "\n";
         achievementsFile << points1000000 << "\n";
 
+        achievementsFile << wentToPrison << "\n";
+        achievementsFile << escapedPrison << "\n";
+
+        achievementsFile << donotcheck << "\n";
+        achievementsFile << donotcheck2 << "\n";
+
         achievementsFile.close();
     }
-    else
-    {
+    else {
         cout << "Error: Unable to save achievements.\n";
     }
 }
 
-void LoadAchievements()
-{
+void LoadAchievements() {
     ifstream achievementsFile(achievementsFilePath);
-    if (achievementsFile.is_open())
-    {
+    if (achievementsFile.is_open()) {
         achievementsFile >> money100;
         achievementsFile >> money1000;
         achievementsFile >> money10000;
@@ -136,16 +199,20 @@ void LoadAchievements()
         achievementsFile >> points100000;
         achievementsFile >> points1000000;
 
+        achievementsFile >> wentToPrison;
+        achievementsFile >> escapedPrison;
+
+        achievementsFile >> donotcheck;
+        achievementsFile >> donotcheck2;
+
         achievementsFile.close();
     }
-    else
-    {
+    else {
         cout << "No achievements file found... Starting fresh!\n";
     }
 }
 
-void DisplayAchievements()
-{
+void DisplayAchievements() {
     cout << "Achievements:\n";
 
     if (money100) cout << "Novice: 100+ money\n";
@@ -164,84 +231,95 @@ void DisplayAchievements()
     if (points10000) cout << "Amazing Player: 10000+ points\n";
     if (points100000) cout << "Super Player: 100000+ points\n";
     if (points1000000) cout << "Sigma Player: 1000000+ points\n";
+
+    if (escapedPrison) cout << "Criminal Crime: You escaped prison\n";
+    if (wentToPrison) cout << "Law Breaker: You went to prison\n";
 }
 
-void AchievementReachedCheck(int money, int points)
-{
-
-    if (money >= 100 && !money100)
-    {
-        //cout << "You got the Novice achievement! (100+ money)\n";
+void PlayAchievementSound() {
+    PlaySound(TEXT("C:\\ReaperGame\\Assets\\achievement.wav"), NULL, SND_FILENAME | SND_ASYNC);
+}
+void PlayActionSound() {
+    PlaySound(TEXT("C:\\ReaperGame\\Assets\\action.wav"), NULL, SND_FILENAME | SND_ASYNC);
+}
+void AchievementReachedCheck(int money, int points) {
+    if (money >= 100 && !money100) {
+        PlayAchievementSound();
+        cout << "You got the Novice achievement! (100+ money)\n";
         money100 = true;
     }
-    if (money >= 1000 && !money1000)
-    {
-        //cout << "You got the Grinder Type Guy achievement! (1000+ money)\n";
+    if (money >= 1000 && !money1000) {
+        PlayAchievementSound();
+        cout << "You got the Grinder Type Guy achievement! (1000+ money)\n";
         money1000 = true;
     }
-    if (money >= 10000 && !money10000)
-    {
-        //cout << "You got the Commander achievement! (10000+ money)\n";
+    if (money >= 10000 && !money10000) {
+        PlayAchievementSound();
+        cout << "You got the Commander achievement! (10000+ money)\n";
         money10000 = true;
     }
-    if (money >= 100000 && !money100000)
-    {
-        //cout << "You got the Destroyer Type Guy achievement! (100000+ money)\n";
+    if (money >= 100000 && !money100000) {
+        PlayAchievementSound();
+        cout << "You got the Destroyer Type Guy achievement! (100000+ money)\n";
         money100000 = true;
     }
-    if (money >= 1000000 && !money1000000)
-    {
-        //cout << "You got the Rich Sigma achievement! (1000000+ money)\n";
+    if (money >= 1000000 && !money1000000) {
+        PlayAchievementSound();
+        cout << "You got the Rich Sigma achievement! (1000000+ money)\n";
         money1000000 = true;
     }
-    if (points > 0 && !firstTransaction)
-    {
-        //cout << "You got the First Transaction achievement! (You did your first transaction)\n";
+
+
+    if (points >= 100 && !points100) {
+        PlayAchievementSound();
+        cout << "You got the Point Grinder achievement! (100+ money)\n";
+        money100 = true;
+    }
+    if (points >= 1000 && !points1000) {
+        PlayAchievementSound();
+        cout << "You got the Pointer achievement! (1000+ money)\n";
+        money1000 = true;
+    }
+    if (points >= 10000 && !points10000) {
+        PlayAchievementSound();
+        cout << "You got the Amazing Player achievement! (10000+ money)\n";
+        money10000 = true;
+    }
+    if (points >= 100000 && !points100000) {
+        PlayAchievementSound();
+        cout << "You got the Super Player achievement! (100000+ money)\n";
+        money100000 = true;
+    }
+    if (points >= 1000000 && !points1000000) {
+        PlayAchievementSound();
+        cout << "You got the Sigma Player achievement! (1000000+ money)\n";
+        money1000000 = true;
+    }
+
+
+    if (points > 0 && !firstTransaction) {
+        PlayAchievementSound();
+        cout << "You got the First Transaction achievement! (You did your first transaction)\n";
         firstTransaction = true;
     }
 
-    if (secretonefound && !foundreaper)
-    {
-        //cout << "Finding the Reaper (You found Reaper who gave you 100 money)\n";
-        firstTransaction = true;
+    if (wentToPrison) {
+        if (!donotcheck)
+        {
+            PlayAchievementSound();
+            cout << "You got the Law Breaker achievement! (You went to prison)\n";
+            donotcheck = true;
+        }
     }
 
-    if (secrettwofound > 0 && !insultreaper)
-    {
-        //cout << "Insulting the Reaper (You insulted Reaper, how dare you)\n";
-        firstTransaction = true;
-    }
+    if (escapedPrison) {
+        if (!donotcheck2)
+        {
+            PlayAchievementSound();
+            cout << "You got the Criminal Crime achievement! (You escaped prison)\n";
+            donotcheck2 = true;
+        }
 
-    if (begging && !begreaper)
-    {
-        //cout << "You got the Begging achievement! (Stop begging Reaper for money, please)\n";
-        firstTransaction = true;
-    }
-
-    if (points >= 100 && !points100)
-    {
-        //cout << "You got the Point Grinder achievement! (100+ points)\n";
-        points100 = true;
-    }
-    if (points >= 1000 && !points1000)
-    {
-        //cout << "You got the Pointer achievement! (1000+ points)\n";
-        points1000 = true;
-    }
-    if (points >= 10000 && !points10000)
-    {
-        //cout << "You got the Amazing Player achievement! (10000+ points)\n";
-        points10000 = true;
-    }
-    if (points >= 100000 && !points100000)
-    {
-        //cout << "You got the Super Player achievement! (100000+ points)\n";
-        points100000 = true;
-    }
-    if (points >= 1000000 && !points1000000)
-    {
-        //cout << "You got the Sigma Player achievement! (1000000+ points)\n";
-        points1000000 = true;
     }
     SaveAchievements();
 }
@@ -326,15 +404,18 @@ void Settings(string& autoload, string& autosave, const string& settingsFilePath
         if (choice == 1) {
             cout << "Toggle Autoload save data (on/off): ";
             cin >> autoload;
+            PlayActionSound();
         }
         else if (choice == 2) {
             cout << "Toggle Autosave save data (on/off): ";
             cin >> autosave;
+            PlayActionSound();
         }
         else if (choice == 3) {
             cout << "Enter new font size (1 is for small, 2 is for medium, and 3 is for large): ";
             fontSize = getValidInt();
             SetFontSize(fontSize);
+            PlayActionSound();
         }
         else if (choice == 4) {
             ResetSettings(settingsFilePath);
@@ -343,6 +424,7 @@ void Settings(string& autoload, string& autosave, const string& settingsFilePath
         }
         else if (choice == 5) {
             SaveSettings(autoload, autosave, settingsFilePath);
+            PlayActionSound();
             break;
         }
         else {
@@ -377,18 +459,19 @@ void HandleTransaction(int& money, int& points) {
             double tax = convertAmount / 4;
             tax = ceil(tax);
             taxamount += static_cast<int>(tax);
+            PlayActionSound();
             AchievementReachedCheck(money, points);
             break;
         }
     }
 }
 
-void HandlePlayAGame(int& money, int& points, mt19937& gen) {
-    uniform_int_distribution<int> dist(1, 100);
+void HandlePlayAGame(int& money, int& points) {
+
 
     while (true) {
-        int randomNum1 = dist(gen);
-        int randomNum2 = dist(gen);
+        int randomNum1 = rand() % 101 + 1;
+        int randomNum2 = rand() % 101 + 1;
         int correctAnswer;
         string operation;
 
@@ -418,10 +501,12 @@ void HandlePlayAGame(int& money, int& points, mt19937& gen) {
             tax = ceil(tax);
             taxamount += static_cast<int>(tax);
             csamount += 1;
+            PlayActionSound();
             AchievementReachedCheck(money, points);
             break;
         }
         else {
+            PlayActionSound();
             cout << "Wrong answer! Would you like to try again (y/n)? ";
             string retry;
             cin >> retry;
@@ -454,8 +539,9 @@ void HandleLoad(const string& saveFilePath, int& money, int& points) {
         if (getline(loadFile, line)) secretonefound = stoi(line);
         if (getline(loadFile, line)) secrettwofound = stoi(line);
         if (getline(loadFile, line)) csamount = stoi(line);
+        if (getline(loadFile, line)) inprison = stoi(line);
 
-        cout << "Game loaded! (Money: " << money << "), (Points: " << points << "), (Taxes needed to pay: " << taxamount << "), (Child support you owe: " << csamount << ")\n" << inprison;
+        cout << "Game loaded! (Money: " << money << "), (Points: " << points << "), (Taxes needed to pay: " << taxamount << "), (Child support you owe: " << csamount << ")\n";
     }
     else {
         cout << "No saved game found.\n";
@@ -482,6 +568,8 @@ void HandleMoney(int money) {
 }
 
 void HandleGamble(int& money) {
+    MP3Silently("C:\\ReaperGame\\Assets\\gamble.mp3", true);
+
     if (money <= 0) {
         cout << "You don't have enough money to gamble.\n";
         return;
@@ -499,27 +587,162 @@ void HandleGamble(int& money) {
         return;
     }
 
-    uniform_int_distribution<int> dist(1, 100);
-    uniform_real_distribution<double> dist2(1, 2.5);
-    random_device rd;
-    mt19937 gen(rd());
-    int chance = dist(gen);
-    double chance2 = dist2(gen);
+    int chance = rand() % 101;
+    double chance2 = ((rand() % 201) / 100.0) + 1.25;  //between 1.25 and 3.25
 
     if (chance <= 66) {
-        int winnings = gambleAmount * chance2;
-        winnings = ceil(winnings);
-        money += static_cast<int>(winnings);
+        int winnings = ceil(gambleAmount * chance2);
+        money += winnings;
         cout << "You won! You gained " << winnings << " money.\n";
-        double tax = winnings / 3;
-        tax = ceil(tax);
-        taxamount += static_cast<int>(tax);
+
+        int tax = ceil(winnings / 3.0);
+        taxamount += tax;
         csamount += 1;
+
+        MP3Silently("C:\\ReaperGame\\Assets\\gamble.mp3", false);
+        PlayActionSound();
         AchievementReachedCheck(money, points);
     }
     else {
         money -= gambleAmount;
         cout << "You lost! You lost " << gambleAmount << " money.\n";
+
+        MP3Silently("C:\\ReaperGame\\Assets\\gamble.mp3", false);
+        PlayActionSound();
+    }
+}
+void Game(); //needed a declaration thanks so much w3schools for the help :3
+
+void Prison()
+{
+    //prison
+    MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", true);
+    inprison = true;
+    csamount = 0;
+    HandleSave(saveFilePath, money, points, true);
+
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
+    HandleSupport();
+    SetFontSize(fontSize);
+    string options;
+    cout << "\nYou are in prison for not paying your child support" << endl;
+    wentToPrison = true;
+    AchievementReachedCheck(money, points);
+    SaveAchievements();
+
+Prisonlist:
+    cout << "\nYour options are:\n";
+    cout << "1. Math (Medium but free)\n\n";
+    cout << "2. Bribery (Easy but costs money)\n\n";
+    cout << "3. Prisonbreak (Hard but free)\n\n";
+
+    cin >> options;
+
+    if (options == "Bribery")
+    {
+        if (money <= 0) {
+            cout << "You don't have enough money to bribe.\n";
+            return;
+        }
+
+        cout << "How much money would you like to bribe? (Current money: " << money << ") the higher the better chance: ";
+        int bribeAmount = getValidInt();
+
+        if (bribeAmount <= 0) {
+            cout << "Invalid amount. Please enter a positive number.\n";
+            return;
+        }
+        else if (bribeAmount > money) {
+            cout << "You don't have enough money to bribe that amount.\n";
+            return;
+        }
+
+        int chance = rand() % 101 + 1;
+
+        if (chance <= pow(bribeAmount, 0.75f)) {
+            cout << "You lost " << bribeAmount << " money.\n";
+            MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", false);
+            cout << "YOU ARE OUT OF PRISON!!!";
+            inprison = false;
+            HandleSave(saveFilePath, money, points, true);
+            Game();
+        }
+        else
+        {
+            cout << "Your bribe was declined...";
+            goto Prisonlist;
+        }
+    }
+    else if (options == "Prisonbreak")
+    {
+        int chance = rand() % 101 + 1;
+        if (chance <= 10)
+        {
+            MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", false);
+            cout << "YOU ARE OUT OF PRISON!!!";
+            inprison = false;
+            HandleSave(saveFilePath, money, points, true);
+            Game();
+        }
+        else
+        {
+            cout << "You failed to escape...\n";
+            goto Prisonlist;
+        }
+    }
+    else if (options == "Math")
+    {
+        while (true) {
+            int randomNum1 = rand() % 901 + 100;
+            int randomNum2 = rand() % 901 + 100;
+            int correctAnswer;
+            string operation;
+
+            cout << "Choose operation (add/subtract) numbers are generated random from 100 to 1000: ";
+            cin >> operation;
+
+        TryAgain:
+            if (operation == "add") {
+                cout << "What is " << randomNum1 << " + " << randomNum2 << "? ";
+                correctAnswer = randomNum1 + randomNum2;
+            }
+            else if (operation == "subtract") {
+                cout << "What is " << randomNum1 << " - " << randomNum2 << "? ";
+                correctAnswer = randomNum1 - randomNum2;
+            }
+            else {
+                cout << "Invalid operation. Please choose 'add' or 'subtract'.\n";
+                continue;
+            }
+
+            int playerAnswer = getValidInt();
+            if (playerAnswer == correctAnswer) {
+                MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", false);
+                cout << "YOU ARE OUT OF PRISON!!!";
+                inprison = false;
+                HandleSave(saveFilePath, money, points, true);
+                Game();
+                break;
+            }
+            else {
+                cout << "Wrong answer! Would you like to try again (y/n)? ";
+                string retry;
+                cin >> retry;
+                if (retry != "y" && retry != "Y") goto TryAgain;
+            }
+        }
+    }
+    else {
+        if (options != "Options")
+        {
+            cout << "Invalid response\n";
+            goto Prisonlist;
+        }
     }
 }
 
@@ -554,7 +777,7 @@ void HandleTaxes(int& money, int& taxamount) {
                     money -= payment;
                     taxamount -= payment;
                     cout << "You paid " << payment << " in taxes. Your remaining balance is " << money << ".\n";
-
+                    PlayActionSound();
                     if (taxamount <= 0) {
                         cout << "You have fully paid your taxes.\n";
                         return;
@@ -600,6 +823,8 @@ void ChildSupport(int& money, int& childsupportamount)
                 money -= childsupportamount;
                 childsupportamount = 0;
                 cout << "Child support fully paid. Remaining money: " << money << "\n";
+                PlayActionSound();
+                AchievementReachedCheck(money, points);
             }
             else {
                 cout << "You do not have enough money to pay the full child support.\n";
@@ -622,163 +847,15 @@ void ChildSupport(int& money, int& childsupportamount)
         cout << "Child support is fully paid. Thank you!\n";
     }
 }
-
-void OutOfPrison()
+void Game()
 {
-    cout << "YOU ARE OUT OF PRISON!!!";
-    HandleSupport();
-
-    if (system(("mkdir " + folderPath).c_str())) {}
-
-    random_device rd;
-    mt19937 gen(rd());
-
-    string autoload, autosave;
-    LoadSettings(autoload, autosave, settingsFilePath);
-    SetFontSize(fontSize);
-
-    if (autoload == "on") {
-        HandleLoad(saveFilePath, money, points);
-    }
-    LoadAchievements();
-    AchievementReachedCheck(money, points);
-    DisplayCommands();
-}
-
-void Prison()
-{
-    csamount = 0;
-    inprison = true;
-    HandleSave(saveFilePath, money, points, true);
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-    HandleSupport();
-    SetFontSize(fontSize);
-    inprison = true;
-    string options;
-    cout << "\nYou are in prison for not paying your child support" << endl;
-Prisonlist:
-    cout << "\nYour options are:\n";
-    cout << "1. Math (Medium but free)\n\n";
-    cout << "2. Bribery (Easy but costs money)\n\n";
-    cout << "3. Prisonbreak (Hard but free)\n\n";
-
-    cin >> options;
-
-    if (options == "Bribery")
-    {
-        if (money <= 0) {
-            cout << "You don't have enough money to bribe.\n";
-            return;
-        }
-
-        cout << "How much money would you like to bribe? (Current money: " << money << ") the higher the better chance: ";
-        int bribeAmount = getValidInt();
-
-        if (bribeAmount <= 0) {
-            cout << "Invalid amount. Please enter a positive number.\n";
-            return;
-        }
-        else if (bribeAmount > money) {
-            cout << "You don't have enough money to bribe that amount.\n";
-            return;
-        }
-
-        uniform_int_distribution<int> dist(1, 100);
-        random_device rd;
-        mt19937 gen(rd());
-        int chance = dist(gen);
-
-        if (chance <= pow(bribeAmount, 0.75f)) {
-            cout << "You lost " << bribeAmount << " money.\n";
-            OutOfPrison();
-        }
-        else
-        {
-            cout << "Your bribe was declined...";
-            goto Prisonlist;
-        }
-    }
-    else if (options == "Prisonbreak")
-    {
-        uniform_int_distribution<int> dist(1, 100);
-        random_device rd;
-        mt19937 gen(rd());
-        int chance = dist(gen);
-        if (chance <= 10)
-        {
-            OutOfPrison();
-        }
-        else
-        {
-            cout << "You failed to escape...";
-            goto Prisonlist;
-        }
-
-    }
-    else if (options == "Math")
-    {
-        random_device rd;
-        mt19937 gen(rd());
-        uniform_int_distribution<int> dist(100, 1000);
-
-        while (true) {
-            int randomNum1 = dist(gen);
-            int randomNum2 = dist(gen);
-            int correctAnswer;
-            string operation;
-
-            cout << "Choose operation (add/subtract) numbers are generated randon from 100 to 1000: ";
-            cin >> operation;
-
-            if (operation == "add") {
-                cout << "What is " << randomNum1 << " + " << randomNum2 << "? ";
-                correctAnswer = randomNum1 + randomNum2;
-            }
-            else if (operation == "subtract") {
-                cout << "What is " << randomNum1 << " - " << randomNum2 << "? ";
-                correctAnswer = randomNum1 - randomNum2;
-            }
-            else {
-                cout << "Invalid operation. Please choose 'add' or 'subtract'.\n";
-                continue;
-            }
-
-            int playerAnswer = getValidInt();
-            if (playerAnswer == correctAnswer) {
-                OutOfPrison();
-                break;
-            }
-            else {
-                cout << "Wrong answer! Would you like to try again (y/n)? ";
-                string retry;
-                cin >> retry;
-                if (retry != "y" || retry != "Y") break;
-            }
-        }
-    }
-    else {
-        if (options != "Options")
-        {
-            cout << "Invalid response\n";
-            goto Prisonlist;
-        }
-    }
-
-}
-
-int main() {
     system("title Reaper's Cool Game");
 
+    AssetsFolder();
+
     HandleSupport();
 
     if (system(("mkdir " + folderPath).c_str())) {}
-
-    random_device rd;
-    mt19937 gen(rd());
 
     string autoload, autosave;
     LoadSettings(autoload, autosave, settingsFilePath);
@@ -791,24 +868,21 @@ int main() {
     AchievementReachedCheck(money, points);
     DisplayCommands();
 
-    while (true) {
+    while (true)
         if (!inprison)
         {
             if (csamount == 15)
             {
                 Prison();
             }
+            //commands
             string command;
             cin >> command;
             if (command == "/help") DisplayCommands();
-
-            else if (command == "/achievements")
-            {
-                DisplayAchievements();
-            }
+            else if (command == "/achievements") DisplayAchievements();
             else if (command == "/support") HandleSupport();
             else if (command == "/transaction") HandleTransaction(money, points);
-            else if (command == "/playagame") HandlePlayAGame(money, points, gen);
+            else if (command == "/playagame") HandlePlayAGame(money, points);
             else if (command == "/save") HandleSave(saveFilePath, money, points, true);
             else if (command == "/load") HandleLoad(saveFilePath, money, points);
             else if (command == "/settings") Settings(autoload, autosave, settingsFilePath);
@@ -823,13 +897,8 @@ int main() {
                 string response;
                 cout << "Confirm (y/n)?";
                 cin >> response;
-                if (response == "y" || response == "Y")
-                {
-                    break;
-                }
-                else
-                {
-                    return 0;
+                if (response == "y" || response == "Y") {
+                    exit(0);
                 }
             }
             else if (command == "/clear")
@@ -854,8 +923,8 @@ int main() {
             {
                 if (secretonefound == false)
                 {
-                    cout << "Guh, I guess you have found me\nI will give you 100 money, i paid the taxes for you btw and np.\n";
-                    money += 100;
+                    cout << "Guh, I guess you have found me\nI will give you 1000 money, i paid the taxes for you btw and np.\n";
+                    money += 1000;
                     secretonefound = true;
                     AchievementReachedCheck(money, points);
                 }
@@ -889,6 +958,8 @@ int main() {
                 HandleSave(saveFilePath, money, points, false);
             }
         }
-    }
-    return 0;
+}
+int main() {
+    srand(time(0)); //cant believe i accidently put this in a while(true) loop before lol
+    Game();
 }
