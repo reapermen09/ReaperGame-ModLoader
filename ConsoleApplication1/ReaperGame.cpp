@@ -7,6 +7,8 @@
 #include <ctime>
 #include <stdio.h>
 #include <windows.h>
+#include <thread>
+#include <chrono>
 #include <C:\cstuff\bass24\c\bass.h>
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "C:\\cstuff\\bass24\\c\\x64\\bass.lib") //reaper leak fr (also lazy tbh)
@@ -847,8 +849,24 @@ void ChildSupport(int& money, int& childsupportamount)
         cout << "Child support is fully paid. Thank you!\n";
     }
 }
+
+void TypeEffect(const string& text, int delay_ms) {
+    for (char c : text) {
+        cout << c << flush;
+        this_thread::sleep_for(chrono::milliseconds(delay_ms));
+    }
+    cout << endl;
+}
+
+void Mrati();
+
 void Game()
 {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     system("title Reaper's Cool Game");
 
     AssetsFolder();
@@ -950,8 +968,53 @@ void Game()
                     cout << "Odd specimen\n";
                 }
             }
+            else if (command == "/therat")
+            {
+                string input;
+                TypeEffect("MRATI: LET ME TELL YOU A STORY...\n", 70);
+                cout << "(y/n)?";
+                cin >> input;
+                if (input == "y" || input == "Y")
+                {
+                    TypeEffect("MRATI: Why thank you actually! :D\n", 70);
+                    goto Story;
+                }
+                else if (input == "n" || input == "N")
+                {
+                    TypeEffect("MRATI: (Ignoring your input)\n", 70);
+                    goto Story;
+                }
+                else 
+                {
+                    TypeEffect("MRATI: Learn how to respond you!!!", 70);
+                    goto Story;
+                }
+            Story:
+                TypeEffect("MRATI: Anyways... I was a crocodile once bit by an evil rat!\n", 70);
+                TypeEffect("MRATI: This is why I love joe biden he is so awesome! :3\n", 70);
+                TypeEffect("MRATI: This is why I am a rat...\n", 70);
+                TypeEffect("MRATI: Cool story?\n", 70);
+                cout << "(y/n)?";
+                string input2;
+                cin >> input2;
+                if (input2 == "y" || input2 == "Y")
+                {
+                    TypeEffect("MRATI: Thank you I am proud to be your guest :D\n", 70);
+                }
+                else if (input2 == "n" || input2 == "N")
+                {
+                    TypeEffect("MRATI: KYS\n", 70);
+                    TypeEffect("......... Boss encounter!!!\n", 70);
+                    Sleep(250);
+                    Mrati();
+                }
+                else
+                {
+                    TypeEffect("MRATI: Learn how to respond you!!!", 70);
+                }
+            }
             else {
-                cout << "Invalid command. Type /help for available commands.\n";
+                    cout << "Invalid command. Type /help for available commands.\n";
             }
 
             if (autosave == "on") {
@@ -963,3 +1026,160 @@ int main() {
     srand(time(0)); //cant believe i accidently put this in a while(true) loop before lol
     Game();
 }
+
+
+
+
+
+
+
+
+
+
+
+//BOSS!!!
+
+void Mrati() {
+    MP3Silently("C:\\ReaperGame\\Assets\\mrati.mp3", true);
+
+    int ratiHP = 70;
+    int playerHP = 50;
+    int playerPotions = 5;
+    int ratiPotions = 3;
+    int money = 0;
+
+        TypeEffect("MRATI: YOUR OPINION DOESNT MATTER TO A MAN LIKE ME!@#$%\n", 40);
+        Sleep(800);
+        TypeEffect("MRATI: I'll make you pay...\n", 40);
+        Sleep(2200);
+
+        while (ratiHP > 0 && playerHP > 0) {
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+
+            cout << "PLAYERS TURN!!!\n\n";
+            cout << "RATI Health: " + to_string(ratiHP) + "\n";
+            cout << "Player Health: " + to_string(playerHP) + "\n\n";
+
+            cout << "Attack Options (case-sensitive):\n";
+            cout << "Emotional Damage\n";
+            cout << "Tax Forms\n";
+            cout << "Child Support\n";
+            if (playerPotions > 0) {
+                cout << "Heal (" << playerPotions << " potions left)\n";
+            }
+            cout << "\n";
+
+            string input;
+            getline(cin, input);
+            filter = false;
+            int damageToRat = rand() % 11 + 1;
+            int chance = rand() % 101 + 1;
+
+            if (input == "Emotional Damage") {
+                TypeEffect("Rolling Dice...\n", 60);
+                Sleep(400);
+                TypeEffect("Dice came out as... " + to_string(damageToRat) + " damage!\n", 60);
+
+                if (chance <= 10) {
+                    TypeEffect("BUT WAIT... You have missed and caused no emotional damage...\n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                }
+                else {
+                    ratiHP -= damageToRat;
+                    TypeEffect(to_string(damageToRat) + " emotional damage done to rati... \n", 60);
+                    TypeEffect("Rati has: " + to_string(ratiHP) + " HP left. Cry... \n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                    Sleep(2000);
+                }
+            }
+            else if (input == "Tax Forms") {
+                TypeEffect("Rolling Dice...\n", 60);
+                Sleep(400);
+                TypeEffect("Dice came out as... " + to_string(damageToRat) + " damage!\n", 60);
+
+                if (chance <= 10) {
+                    TypeEffect("BUT WAIT... You have missed...\n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                }
+                else {
+                    ratiHP -= damageToRat;
+                    TypeEffect(to_string(damageToRat) + " Tax Forms given to rati... \n", 60);
+                    TypeEffect("Rati has: " + to_string(ratiHP) + " HP left. I HATE TAXES!!! \n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                    Sleep(2000);
+                }
+            }
+            else if (input == "Child Support") {
+                TypeEffect("Rolling Dice...\n", 60);
+                Sleep(400);
+                TypeEffect("Dice came out as... " + to_string(damageToRat) + " damage!\n", 60);
+
+                if (chance <= 10) {
+                    TypeEffect("BUT WAIT... Rati doesnt have a child currently...\n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                }
+                else {
+                    ratiHP -= damageToRat;
+                    TypeEffect(to_string(damageToRat) + " Child Support money taken from rati... \n", 60);
+                    TypeEffect("Rati has: " + to_string(ratiHP) + " HP left. I HATE PAYING CHILD SUPPORT!!! \n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                    Sleep(2000);
+                }
+            }
+            else if (input == "Heal") {
+                if (playerPotions > 0) {
+                    playerHP += 20;
+                    playerPotions--;
+                    TypeEffect("You used a healing potion! +" + to_string(20) + " HP.\n", 60);
+                    TypeEffect("You have " + to_string(playerPotions) + " healing potions left.\n", 60);
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                    Sleep(2000);
+                }
+                else {
+                    TypeEffect("No potions left! Try a different option...\n", 60);
+                    continue;
+                }
+            }
+            else {
+                if (!filter)
+                {
+                    TypeEffect("Invalid option! Try again.\n", 60);
+                }
+                continue;
+            }
+
+            //Rati's turn
+            if (ratiHP > 0) {
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+                cout << "RATIS TURN!!!\n\n";
+                cout << "RATI Health: " + to_string(ratiHP) + "\n";
+                cout << "Player Health: " + to_string(playerHP) + "\n\n";
+
+                int ratiDamage = rand() % 11 + 1;
+                playerHP -= ratiDamage;
+                TypeEffect("Rati dealt " + to_string(ratiDamage) + " damage to you.\n", 60);
+                TypeEffect("You have: " + to_string(playerHP) + " HP left.\n", 60);
+                TypeEffect("PLAYER'S TURN!!!\n\n", 30);
+                Sleep(2000);
+            }
+        }
+
+        if (ratiHP <= 0) {
+            TypeEffect("Rati has been defeated! You win!\n", 60);
+            TypeEffect("You won 5,000 money\n", 60);
+            money += 5000;
+            Sleep(1000);
+        }
+        else if (playerHP <= 0) {
+            TypeEffect("You have been defeated by Rati... Game Over!\n", 60);
+            Sleep(1000);
+        }
+    }
