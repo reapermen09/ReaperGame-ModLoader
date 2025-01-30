@@ -1075,7 +1075,6 @@ void Mrati() {
 
             string input;
             getline(cin, input);
-            filter = false;
             int damageToRat = rand() % 11 + 1;
             int chance = rand() % 101 + 1;
 
@@ -1145,10 +1144,7 @@ void Mrati() {
                 }
             }
             else {
-                if (!filter)
-                {
                     TypeEffect("Invalid option! Try again.\n", 60);
-                }
                 continue;
             }
 
