@@ -41,7 +41,7 @@ public:
     virtual void ModAchievementSave();
     ///Load Mod Achievements (used for custom)
     virtual void ModAchievementLoad();
-    ///Add commands
+    ///Add commands (always include: cout << "\033[A\33[2K\r";)
     virtual void CommandList();
     ///Adds bosses
     virtual void Bosses();
@@ -52,7 +52,9 @@ public:
     virtual void Music(const char* mp3File, bool playstop);
     ///Special typing effect! delay_ms is how long it takes to write out
     virtual void Type(const string& text, int delay_ms);
-    //Load Something
+    ///Load Something
     virtual void Load();
+    ///See mod description (does not need a mod enable check)
+    virtual void ModDescription();
 };
 #endif

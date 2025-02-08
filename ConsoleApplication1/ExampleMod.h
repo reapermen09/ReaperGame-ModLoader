@@ -14,6 +14,7 @@ public:
     void ModAchievementLoad() override;
     void ModifyAchievements() override;
     void ModAchievementDisplay() override;
+    void ModDescription() override;
 };
 
 #endif

@@ -359,7 +359,8 @@ void DisplayCommands() {
     cout << "/taxes - Pay your taxes\n";
     cout << "/childsupport - Pay your child support\n";
     cout << "/exit - Exit game\n";
-    cout << "/clear - clears all text (keeps commands)\n\n";
+    cout << "/clear - clears all text (keeps commands)\n";
+    cout << "/checkdesc[ModNameHere] - you can see the real mod name in the ModLoader menu in ModList\n\n";
     reaperExampleMod.CommandList();
     betterMathGamesMod.CommandList();
 }
@@ -897,7 +898,7 @@ void Game()
 #else
     system("clear");
 #endif
-    system("title RgModLoader v1.0");
+    system("title RgModLoader v1.1");
 
     AssetsFolder();
     HandleSupport();
@@ -1054,6 +1055,15 @@ void Game()
                 betterMathGamesMod.Load();
             }
 
+            //Description Commands
+            else if (command == "/checkdesc[ExampleMod]")
+            {
+                reaperExampleMod.ModDescription();
+            }
+            else if (command == "/checkdesc[BetterMathGamesMod]")
+            {
+                betterMathGamesMod.ModDescription();
+            }
 
             else {
                     cout << "Invalid command. Type /help for available commands.\n";
@@ -1102,8 +1112,8 @@ void LoadModSettings(vector<Mods>& modList, const string& filePath) {
     }
 }
 
-/*int main() {
-    system("title RgModLoader v1.0");
+int main() {
+    system("title RgModLoader v1.1");
     SetFontSize(def.fontSize);
 
     cout << "Game and Modloader made by " << def.developerExName << "\n";
@@ -1168,7 +1178,7 @@ void LoadModSettings(vector<Mods>& modList, const string& filePath) {
         else {
             goto Start;
         }
-        cout << "Want to make more changes? (y/n): ";
+        cout << "Want to make any more changes? (y/n): ";
         cin >> changeSettings;
     } while (changeSettings == 'y' || changeSettings == 'Y');
     Start:
@@ -1183,7 +1193,7 @@ void LoadModSettings(vector<Mods>& modList, const string& filePath) {
         Game();
     }
     else {
-        cout << "Exiting...\n";
+        cout << "Exiting Modloader...\n";
     }
 
     return 0;
@@ -1191,7 +1201,7 @@ void LoadModSettings(vector<Mods>& modList, const string& filePath) {
 
 
 
-*/
+
 
 
 

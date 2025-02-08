@@ -20,7 +20,7 @@ void BetterMathGamesMod::CommandList()
 {
     if (modEnabled) {
         cout << "\033[A\33[2K\r";
-        cout << "/playmath (Better Math Games Mod)\n\n";
+        cout << "/playmath [BetterMathGamesMod]\n\n";
     }
 }
 double CalculateTriangleArea(double base, double height) {
@@ -95,8 +95,11 @@ void ArithmeticOperations(int minRandom, int maxRandom) {
 
     if (std::abs(userAnswer - correctAnswer) < 0.01) {
         cout << "Correct! The answer is indeed " << correctAnswer << ".\n";
-        def.money += abs(ceil(num2 / 4));
-        cout << "Your money increased by " << ceil(num2/4) << endl;
+        def.money += abs(ceil(num2 / 4)) + 1;
+        cout << "Your money increased by " << ceil(1 + (num2/4)) << endl;
+        double tax = abs(ceil(num2 / 8));
+        def.taxamount += static_cast<int>(tax);
+        def.csamount += 1;
     }
     else {
         cout << "Incorrect. The correct answer is " << correctAnswer << ".\n";
@@ -145,8 +148,11 @@ void PlayGame() {
 
             if (std::abs(userArea - area) < 0.01) {
                 cout << "Correct! The area of the triangle is indeed " << area << ".\n";
-                def.money += abs(ceil(area / 4));
-                cout << "Your money increased by " << abs(ceil(area / 4)) << endl;
+                def.money += abs(ceil(area / 4)) + 1;
+                cout << "Your money increased by " << abs(ceil(1 + (area / 4))) + 1 << endl;
+                double tax = abs(ceil(area / 9));
+                def.taxamount += static_cast<int>(tax);
+                def.csamount += 1;
             }
             else {
                 cout << "Incorrect. The correct area is " << area << ".\n";
@@ -172,7 +178,10 @@ void PlayGame() {
             if (std::abs(userArea - area) < 0.01) {
                 cout << "Correct! The area of the square is indeed " << area << ".\n";
                 def.money += abs(ceil(area / 3));
-                cout << "Your money increased by " << abs(ceil(area / 3)) << endl;
+                cout << "Your money increased by " << abs(ceil(1 + (area / 3))) + 1 << endl;
+                double tax = abs(ceil(area / 8));
+                def.taxamount += static_cast<int>(tax);
+                def.csamount += 1;
             }
             else {
                 cout << "Incorrect. The correct area is " << area << ".\n";
@@ -198,8 +207,11 @@ void PlayGame() {
 
             if (std::abs(userHypotenuse - hypotenuse) < 0.01) {
                 cout << "Correct! The hypotenuse is indeed " << hypotenuse << ".\n";
-                def.money += abs(ceil(hypotenuse * 2.5));
-                cout << "Your money increased by " << abs(ceil(hypotenuse * 2.5)) << endl;
+                def.money += abs(ceil(hypotenuse * 2.5)) + 1;
+                cout << "Your money increased by " << abs(ceil(1 + (hypotenuse * 2.5))) + 1 << endl;
+                double tax = abs(ceil(hypotenuse));
+                def.taxamount += static_cast<int>(tax);
+                def.csamount += 1;
             }
             else {
                 cout << "Incorrect. The correct hypotenuse is " << hypotenuse << ".\n";
@@ -241,6 +253,22 @@ void PlayGame() {
 void BetterMathGamesMod::Load()
 {
     PlayGame();
+}
+
+void BetterMathGamesMod::ModDescription()
+{
+    string nextLine[] = {
+        "This mod adds a new command called /playmath\n",
+        "Adds Find the Area of a triangle\n",
+        "Adds Find the Area of a square\n",
+        "Adds Find the missing side of a triangle\n",
+        "Adds more and better arithmetic equations\n"
+    };
+
+    for (const auto& line : nextLine)
+    {
+        cout << line << endl;
+    }
 }
 
 void BetterMathGamesMod::InitializeMod() {

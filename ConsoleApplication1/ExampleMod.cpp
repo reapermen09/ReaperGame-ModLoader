@@ -37,8 +37,8 @@ void ExampleMod::CommandList()
 {
     if (modEnabled)
     {
-        cout << "\033[A\33[2K\r"; //this will clear a line above
-        cout << "/exampleboss (Example Mod)\n\n";
+        cout << "\033[A\33[2K\r"; //this will clear a line above (always include this)
+        cout << "/exampleboss [ExampleMod]\n\n";
     }
 }
 string saveAchievements = "C:\\ReaperGame\\SaveData\\ExampleModAchievements.txt";
@@ -325,6 +325,12 @@ void ExampleMod::Bosses()
             cout << "type /help for commands\n";
         }
     }
+}
+
+void ExampleMod::ModDescription()
+{
+    //you shouldnt put an enable check here preferably
+    cout << "This is an Example Description!\n\n";
 }
 
 void ExampleMod::InitializeMod() {

@@ -118,7 +118,7 @@ void Mod::ModSave() {}
 ///Load Mod stuff (used for custom)
 void Mod::ModLoad() {}
 
-///Add commands
+///Add commands (always include: cout << "\033[A\33[2K\r";)
 void Mod::CommandList() {}
 
 ///Adds bosses
@@ -135,3 +135,6 @@ void Mod::ModAchievementDisplay() {}
 
 ///Load something
 void Mod::Load() {}
+
+///See mod description (does not need a mod enable check)
+void Mod::ModDescription() {}

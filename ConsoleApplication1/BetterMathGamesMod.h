@@ -10,6 +10,7 @@ public:
     void InitializeMod() override;
     void CommandList() override;
     void Load() override;
+    void ModDescription() override;
 };
 
 #endif
