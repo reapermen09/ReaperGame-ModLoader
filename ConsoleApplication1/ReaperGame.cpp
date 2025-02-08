@@ -9,7 +9,11 @@
 #include <windows.h>
 #include <thread>
 #include <chrono>
+#include <vector>
 #include <C:\cstuff\bass24\c\bass.h>
+#include "ExampleMod.h"
+#include "BetterMathGamesMod.h"
+#include "Defaults.h"
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "C:\\cstuff\\bass24\\c\\x64\\bass.lib") //reaper leak fr (also lazy tbh)
 
@@ -17,19 +21,8 @@ using namespace std;
 
 #undef max
 
-int taxamount = 0;
-int csamount = 0;
-int fontSize;
-bool inprison = false;
-bool secretonefound = false;
-bool secrettwofound = false;
-bool begging = false;
-int money = 10;
-int points = 0;
-string folderPath = "C:\\ReaperGame\\SaveData";
-string saveFilePath = folderPath + "\\game_save.txt";
-string settingsFilePath = folderPath + "\\settings.txt";
-string achievementsFilePath = folderPath + "\\achievements.txt";
+ExampleMod reaperExampleMod;
+BetterMathGamesMod betterMathGamesMod;
 
 void AssetsFolder() {
     const char* folderPath = "C:\\ReaperGame\\Assets";
@@ -122,120 +115,105 @@ int getValidInt() {
     }
 }
 
-bool money100 = false;
-bool money1000 = false;
-bool money10000 = false;
-bool money100000 = false;
-bool money1000000 = false;
-
-bool firstTransaction = false;
-
-bool foundreaper = false;
-bool insultreaper = false;
-bool begreaper = false;
-
-bool wentToPrison = false;
-bool escapedPrison = false;
-
-bool points100 = false;
-bool points1000 = false;
-bool points10000 = false;
-bool points100000 = false;
-bool points1000000 = false;
-
-//checking stuff bruh
-bool donotcheck = false;
-bool donotcheck2 = false;
-
 void SaveAchievements() {
-    ofstream achievementsFile(achievementsFilePath);
+    ofstream achievementsFile(def.achievementsFilePath);
     if (achievementsFile.is_open()) {
-        achievementsFile << money100 << "\n";
-        achievementsFile << money1000 << "\n";
-        achievementsFile << money10000 << "\n";
-        achievementsFile << money100000 << "\n";
-        achievementsFile << money1000000 << "\n";
+        achievementsFile << def.money100 << "\n";
+        achievementsFile << def.money1000 << "\n";
+        achievementsFile << def.money10000 << "\n";
+        achievementsFile << def.money100000 << "\n";
+        achievementsFile << def.money1000000 << "\n";
 
-        achievementsFile << firstTransaction << "\n";
+        achievementsFile << def.firstTransaction << "\n";
 
-        achievementsFile << foundreaper << "\n";
-        achievementsFile << insultreaper << "\n";
-        achievementsFile << begreaper << "\n";
+        achievementsFile << def.foundreaper << "\n";
+        achievementsFile << def.insultreaper << "\n";
+        achievementsFile << def.begreaper << "\n";
 
-        achievementsFile << points100 << "\n";
-        achievementsFile << points1000 << "\n";
-        achievementsFile << points10000 << "\n";
-        achievementsFile << points100000 << "\n";
-        achievementsFile << points1000000 << "\n";
+        achievementsFile << def.points100 << "\n";
+        achievementsFile << def.points1000 << "\n";
+        achievementsFile << def.points10000 << "\n";
+        achievementsFile << def.points100000 << "\n";
+        achievementsFile << def.points1000000 << "\n";
 
-        achievementsFile << wentToPrison << "\n";
-        achievementsFile << escapedPrison << "\n";
+        achievementsFile << def.wentToPrison << "\n";
+        achievementsFile << def.escapedPrison << "\n";
 
-        achievementsFile << donotcheck << "\n";
-        achievementsFile << donotcheck2 << "\n";
+        achievementsFile << def.donotcheck << "\n";
+        achievementsFile << def.donotcheck2 << "\n";
+
+        achievementsFile << def.beatRati << "\n";
 
         achievementsFile.close();
     }
     else {
         cout << "Error: Unable to save achievements.\n";
     }
+    reaperExampleMod.ModAchievementSave();
 }
 
 void LoadAchievements() {
-    ifstream achievementsFile(achievementsFilePath);
+    ifstream achievementsFile(def.achievementsFilePath);
     if (achievementsFile.is_open()) {
-        achievementsFile >> money100;
-        achievementsFile >> money1000;
-        achievementsFile >> money10000;
-        achievementsFile >> money100000;
-        achievementsFile >> money1000000;
+        achievementsFile >> def.money100;
+        achievementsFile >> def.money1000;
+        achievementsFile >> def.money10000;
+        achievementsFile >> def.money100000;
+        achievementsFile >> def.money1000000;
 
-        achievementsFile >> firstTransaction;
-        achievementsFile >> foundreaper;
-        achievementsFile >> insultreaper;
-        achievementsFile >> begreaper;
+        achievementsFile >> def.firstTransaction;
+        achievementsFile >> def.foundreaper;
+        achievementsFile >> def.insultreaper;
+        achievementsFile >> def.begreaper;
 
-        achievementsFile >> points100;
-        achievementsFile >> points1000;
-        achievementsFile >> points10000;
-        achievementsFile >> points100000;
-        achievementsFile >> points1000000;
+        achievementsFile >> def.points100;
+        achievementsFile >> def.points1000;
+        achievementsFile >> def.points10000;
+        achievementsFile >> def.points100000;
+        achievementsFile >> def.points1000000;
 
-        achievementsFile >> wentToPrison;
-        achievementsFile >> escapedPrison;
+        achievementsFile >> def.wentToPrison;
+        achievementsFile >> def.escapedPrison;
 
-        achievementsFile >> donotcheck;
-        achievementsFile >> donotcheck2;
+        achievementsFile >> def.donotcheck;
+        achievementsFile >> def.donotcheck2;
+
+        achievementsFile >> def.beatRati;
 
         achievementsFile.close();
     }
     else {
         cout << "No achievements file found... Starting fresh!\n";
     }
+    reaperExampleMod.ModAchievementLoad();
 }
 
 void DisplayAchievements() {
     cout << "Achievements:\n";
 
-    if (money100) cout << "Novice: 100+ money\n";
-    if (money1000) cout << "Grinder Type Guy: 1000+ money\n";
-    if (money10000) cout << "Commander: 10000+ money\n";
-    if (money100000) cout << "Destroyer Type Guy: 100000+ money\n";
-    if (money1000000) cout << "Rich Sigma: 1000000+ money\n";
+    if (def.money100) cout << "Novice: 100+ money\n";
+    if (def.money1000) cout << "Grinder Type Guy: 1000+ money\n";
+    if (def.money10000) cout << "Commander: 10000+ money\n";
+    if (def.money100000) cout << "Destroyer Type Guy: 100000+ money\n";
+    if (def.money1000000) cout << "Rich Sigma: 1000000+ money\n";
 
-    if (firstTransaction) cout << "First Transaction: Completed your first transaction\n";
-    if (foundreaper) cout << "Finding the Reaper: You found Reaper who gave you 100 money\n";
-    if (insultreaper) cout << "Insulting the Reaper: You insulted Reaper, how dare you\n";
-    if (begreaper) cout << "Begging: Stop begging Reaper for money, please\n";
+    if (def.firstTransaction) cout << "First Transaction: Completed your first transaction\n";
+    if (def.foundreaper) cout << "Finding the Reaper: You found Reaper who gave you 100 money\n";
+    if (def.insultreaper) cout << "Insulting the Reaper: You insulted Reaper, how dare you\n";
+    if (def.begreaper) cout << "Begging: Stop begging Reaper for money, please\n";
 
-    if (points100) cout << "Point Grinder: 100+ points\n";
-    if (points1000) cout << "Pointer: 1000+ points\n";
-    if (points10000) cout << "Amazing Player: 10000+ points\n";
-    if (points100000) cout << "Super Player: 100000+ points\n";
-    if (points1000000) cout << "Sigma Player: 1000000+ points\n";
+    if (def.points100) cout << "Point Grinder: 100+ points\n";
+    if (def.points1000) cout << "Pointer: 1000+ points\n";
+    if (def.points10000) cout << "Amazing Player: 10000+ points\n";
+    if (def.points100000) cout << "Super Player: 100000+ points\n";
+    if (def.points1000000) cout << "Sigma Player: 1000000+ points\n";
 
-    if (escapedPrison) cout << "Criminal Crime: You escaped prison\n";
-    if (wentToPrison) cout << "Law Breaker: You went to prison\n";
+    if (def.escapedPrison) cout << "Criminal Crime: You escaped prison\n";
+    if (def.wentToPrison) cout << "Law Breaker: You went to prison\n";
+
+    if (def.mratiBeat) cout << "Rati's Defeat: You defeated Rati\n";
+
+    reaperExampleMod.ModAchievementDisplay();
 }
 
 void PlayAchievementSound() {
@@ -245,81 +223,120 @@ void PlayActionSound() {
     PlaySound(TEXT("C:\\ReaperGame\\Assets\\action.wav"), NULL, SND_FILENAME | SND_ASYNC);
 }
 void AchievementReachedCheck(int money, int points) {
-    if (money >= 100 && !money100) {
+    if (money >= 100 && !def.money100) {
         PlayAchievementSound();
         cout << "You got the Novice achievement! (100+ money)\n";
-        money100 = true;
+        def.money100 = true;
     }
-    if (money >= 1000 && !money1000) {
+    if (money >= 1000 && !def.money1000) {
         PlayAchievementSound();
         cout << "You got the Grinder Type Guy achievement! (1000+ money)\n";
-        money1000 = true;
+        def.money1000 = true;
     }
-    if (money >= 10000 && !money10000) {
+    if (money >= 10000 && !def.money10000) {
         PlayAchievementSound();
         cout << "You got the Commander achievement! (10000+ money)\n";
-        money10000 = true;
+        def.money10000 = true;
     }
-    if (money >= 100000 && !money100000) {
+    if (money >= 100000 && !def.money100000) {
         PlayAchievementSound();
         cout << "You got the Destroyer Type Guy achievement! (100000+ money)\n";
-        money100000 = true;
+        def.money100000 = true;
     }
-    if (money >= 1000000 && !money1000000) {
+    if (money >= 1000000 && !def.money1000000) {
         PlayAchievementSound();
         cout << "You got the Rich Sigma achievement! (1000000+ money)\n";
-        money1000000 = true;
+        def.money1000000 = true;
+    }
+
+    if (points >= 1 && !def.firstTransaction)
+    {
+        PlayAchievementSound();
+        cout << "You got the First Transaction achievement! (first transaction)\n";
+        def.firstTransaction = true;
+    }
+
+    if (points > 0 && !def.firstTransaction)
+    {
+        PlayAchievementSound();
+        cout << "You got the First Transaction achievement! (first transaction)\n";
+        def.firstTransaction = true;
+    }
+
+    if (points >= 100 && !def.points100) {
+        PlayAchievementSound();
+        cout << "You got the Point Grinder achievement! (100+ points)\n";
+        def.points100 = true;
+    }
+    if (points >= 1000 && !def.points1000) {
+        PlayAchievementSound();
+        cout << "You got the Pointer achievement! (1000+ points)\n";
+        def.points1000 = true;
+    }
+    if (points >= 10000 && !def.points10000) {
+        PlayAchievementSound();
+        cout << "You got the Amazing Player achievement! (10000+ points)\n";
+        def.points10000 = true;
+    }
+    if (points >= 100000 && !def.points100000) {
+        PlayAchievementSound();
+        cout << "You got the Super Player achievement! (100000+ points)\n";
+        def.points100000 = true;
+    }
+    if (points >= 1000000 && !def.points1000000) {
+        PlayAchievementSound();
+        cout << "You got the Sigma Player achievement! (1000000+ points)\n";
+        def.points1000000 = true;
+    }
+
+    
+    //reaper and rati stuff
+    if (def.secretonefound && !def.foundreaper)
+    {
+        cout << "Finding the Reaper (You found Reaper who gave you 100 money)\n";
+        def.foundreaper = true;
+    }
+    if (def.secrettwofound > 0 && !def.insultreaper)
+    {
+        cout << "Insulting the Reaper (You insulted Reaper, how dare you)\n";
+        def.insultreaper = true;
+    }
+    if (def.begging && !def.begreaper)
+    {
+        cout << "You got the Begging achievement! (Stop begging Reaper for money, please)\n";
+        def.begreaper = true;
+    }
+
+    if (def.beatRati && !def.mratiBeat)
+    {
+        cout << "You got the Boss Defeater achievement! (You beat Rati)\n";
+        def.mratiBeat = true;
     }
 
 
-    if (points >= 100 && !points100) {
-        PlayAchievementSound();
-        cout << "You got the Point Grinder achievement! (100+ money)\n";
-        money100 = true;
-    }
-    if (points >= 1000 && !points1000) {
-        PlayAchievementSound();
-        cout << "You got the Pointer achievement! (1000+ money)\n";
-        money1000 = true;
-    }
-    if (points >= 10000 && !points10000) {
-        PlayAchievementSound();
-        cout << "You got the Amazing Player achievement! (10000+ money)\n";
-        money10000 = true;
-    }
-    if (points >= 100000 && !points100000) {
-        PlayAchievementSound();
-        cout << "You got the Super Player achievement! (100000+ money)\n";
-        money100000 = true;
-    }
-    if (points >= 1000000 && !points1000000) {
-        PlayAchievementSound();
-        cout << "You got the Sigma Player achievement! (1000000+ money)\n";
-        money1000000 = true;
-    }
 
 
-    if (points > 0 && !firstTransaction) {
+    if (points > 0 && !def.firstTransaction) {
         PlayAchievementSound();
         cout << "You got the First Transaction achievement! (You did your first transaction)\n";
-        firstTransaction = true;
+        def.firstTransaction = true;
     }
 
-    if (wentToPrison) {
-        if (!donotcheck)
+    if (def.wentToPrison) {
+        if (!def.donotcheck)
         {
             PlayAchievementSound();
             cout << "You got the Law Breaker achievement! (You went to prison)\n";
-            donotcheck = true;
+            def.donotcheck = true;
         }
     }
 
-    if (escapedPrison) {
-        if (!donotcheck2)
+    if (def.escapedPrison) {
+        if (!def.donotcheck2)
         {
             PlayAchievementSound();
             cout << "You got the Criminal Crime achievement! (You escaped prison)\n";
-            donotcheck2 = true;
+            def.donotcheck2 = true;
         }
 
     }
@@ -343,6 +360,8 @@ void DisplayCommands() {
     cout << "/childsupport - Pay your child support\n";
     cout << "/exit - Exit game\n";
     cout << "/clear - clears all text (keeps commands)\n\n";
+    reaperExampleMod.CommandList();
+    betterMathGamesMod.CommandList();
 }
 
 void LoadSettings(string& autoload, string& autosave, const string& settingsFilePath) {
@@ -354,16 +373,16 @@ void LoadSettings(string& autoload, string& autosave, const string& settingsFile
         getline(settingsFile, fontsize);
 
         try {
-            fontSize = stoi(fontsize);
+            def.fontSize = stoi(fontsize);
         }
         catch (const invalid_argument& e) {
-            fontSize = 3;
+            def.fontSize = 3;
         }
     }
     else {
         autoload = "off";
         autosave = "off";
-        fontSize = 3;
+        def.fontSize = 3;
         cout << "Settings file could not be loaded. Using default settings.\n";
     }
 }
@@ -372,7 +391,7 @@ void SaveSettings(const string& autoload, const string& autosave, const string& 
     if (settingsFile.is_open()) {
         settingsFile << autoload << "\n";
         settingsFile << autosave << "\n";
-        settingsFile << fontSize << "\n";
+        settingsFile << def.fontSize << "\n";
     }
     else {
         cout << "Error saving settings.\n";
@@ -397,7 +416,7 @@ void Settings(string& autoload, string& autosave, const string& settingsFilePath
         cout << "Settings:\n";
         cout << "1 = Autoload save data: " << autoload << "\n";
         cout << "2 = Autosave save data: " << autosave << "\n";
-        cout << "3 = Change Font Size (Current size: " << fontSize << ")\n";
+        cout << "3 = Change Font Size (Current size: " << def.fontSize << ")\n";
         cout << "4 = Reset settings\n";
         cout << "5 = Exit settings\n";
         cout << "Enter your choice (number ex: 1, 2, 3, 4, 5): ";
@@ -415,8 +434,8 @@ void Settings(string& autoload, string& autosave, const string& settingsFilePath
         }
         else if (choice == 3) {
             cout << "Enter new font size (1 is for small, 2 is for medium, and 3 is for large): ";
-            fontSize = getValidInt();
-            SetFontSize(fontSize);
+            def.fontSize = getValidInt();
+            SetFontSize(def.fontSize);
             PlayActionSound();
         }
         else if (choice == 4) {
@@ -460,7 +479,7 @@ void HandleTransaction(int& money, int& points) {
             cout << "Your points increased by " << convertAmount << ", and your money decreased by " << convertAmount << ".\n";
             double tax = convertAmount / 4;
             tax = ceil(tax);
-            taxamount += static_cast<int>(tax);
+            def.taxamount += static_cast<int>(tax);
             PlayActionSound();
             AchievementReachedCheck(money, points);
             break;
@@ -501,8 +520,8 @@ void HandlePlayAGame(int& money, int& points) {
             cout << "Correct! Your money and points increased by " << reward << ".\n";
             double tax = reward / 3;
             tax = ceil(tax);
-            taxamount += static_cast<int>(tax);
-            csamount += 1;
+            def.taxamount += static_cast<int>(tax);
+            def.csamount += 1;
             PlayActionSound();
             AchievementReachedCheck(money, points);
             break;
@@ -520,7 +539,7 @@ void HandlePlayAGame(int& money, int& points) {
 void HandleSave(const string& saveFilePath, int money, int points, bool notify) {
     ofstream saveFile(saveFilePath, ios::out | ios::trunc);
     if (saveFile.is_open()) {
-        saveFile << money << "\n" << points << "\n" << taxamount << "\n" << secretonefound << "\n" << secrettwofound << "\n" << csamount << "\n" << inprison << endl;
+        saveFile << money << "\n" << points << "\n" << def.taxamount << "\n" << def.secretonefound << "\n" << def.secrettwofound << "\n" << def.csamount << "\n" << def.inprison << endl;
         if (notify == true)
         {
             cout << "Game saved!\n";
@@ -537,13 +556,13 @@ void HandleLoad(const string& saveFilePath, int& money, int& points) {
         string line;
         if (getline(loadFile, line)) money = stoi(line);
         if (getline(loadFile, line)) points = stoi(line);
-        if (getline(loadFile, line)) taxamount = stoi(line);
-        if (getline(loadFile, line)) secretonefound = stoi(line);
-        if (getline(loadFile, line)) secrettwofound = stoi(line);
-        if (getline(loadFile, line)) csamount = stoi(line);
-        if (getline(loadFile, line)) inprison = stoi(line);
+        if (getline(loadFile, line))  def.taxamount = stoi(line);
+        if (getline(loadFile, line))  def.secretonefound = stoi(line);
+        if (getline(loadFile, line))  def.secrettwofound = stoi(line);
+        if (getline(loadFile, line))  def.csamount = stoi(line);
+        if (getline(loadFile, line))  def.inprison = stoi(line);
 
-        cout << "Game loaded! (Money: " << money << "), (Points: " << points << "), (Taxes needed to pay: " << taxamount << "), (Child support you owe: " << csamount << ")\n";
+        cout << "Game loaded! (Money: " << money << "), (Points: " << points << "), (Taxes needed to pay: " << def.taxamount << "), (Child support you owe: " << def.csamount << ")\n";
     }
     else {
         cout << "No saved game found.\n";
@@ -556,17 +575,17 @@ void HandleExit() {
     localtime_s(&ltm, &now);
     int hour = ltm.tm_hour;
     cout << "Exiting game! " << (hour >= 6 && hour < 18 ? "Have a good day!" : "Have a good night!") << "\n";
-    AchievementReachedCheck(money, points);
+    AchievementReachedCheck(def.money, def.points);
 }
 
 void HandlePoints(int points) {
     cout << "Current points: " << points << endl;
-    AchievementReachedCheck(money, points);
+    AchievementReachedCheck(def.money, points);
 }
 
 void HandleMoney(int money) {
     cout << "Current money: " << money << endl;
-    AchievementReachedCheck(money, points);
+    AchievementReachedCheck(money, def.points);
 }
 
 void HandleGamble(int& money) {
@@ -574,15 +593,17 @@ void HandleGamble(int& money) {
 
     if (money <= 0) {
         cout << "You don't have enough money to gamble.\n";
+        MP3Silently("C:\\ReaperGame\\Assets\\gamble.mp3", false);
         return;
     }
 
+    Gamble:
     cout << "How much money would you like to gamble? (Current money: " << money << "): ";
     int gambleAmount = getValidInt();
 
     if (gambleAmount <= 0) {
         cout << "Invalid amount. Please enter a positive number.\n";
-        return;
+        goto Gamble;
     }
     else if (gambleAmount > money) {
         cout << "You don't have enough money to gamble that amount.\n";
@@ -598,12 +619,12 @@ void HandleGamble(int& money) {
         cout << "You won! You gained " << winnings << " money.\n";
 
         int tax = ceil(winnings / 3.0);
-        taxamount += tax;
-        csamount += 1;
+        def.taxamount += tax;
+        def.csamount += 1;
 
         MP3Silently("C:\\ReaperGame\\Assets\\gamble.mp3", false);
         PlayActionSound();
-        AchievementReachedCheck(money, points);
+        AchievementReachedCheck(money, def.points);
     }
     else {
         money -= gambleAmount;
@@ -619,9 +640,9 @@ void Prison()
 {
     //prison
     MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", true);
-    inprison = true;
-    csamount = 0;
-    HandleSave(saveFilePath, money, points, true);
+    def.inprison = true;
+    def.csamount = 0;
+    HandleSave(def.saveFilePath, def.money, def.points, true);
 
 #ifdef _WIN32
     system("cls");
@@ -630,11 +651,11 @@ void Prison()
 #endif
 
     HandleSupport();
-    SetFontSize(fontSize);
+    SetFontSize(def.fontSize);
     string options;
     cout << "\nYou are in prison for not paying your child support" << endl;
-    wentToPrison = true;
-    AchievementReachedCheck(money, points);
+    def.wentToPrison = true;
+    AchievementReachedCheck(def.money, def.points);
     SaveAchievements();
 
 Prisonlist:
@@ -645,21 +666,21 @@ Prisonlist:
 
     cin >> options;
 
-    if (options == "Bribery")
+    if (options == "Bribery" || options == "bribery")
     {
-        if (money <= 0) {
+        if (def.money <= 0) {
             cout << "You don't have enough money to bribe.\n";
             return;
         }
 
-        cout << "How much money would you like to bribe? (Current money: " << money << ") the higher the better chance: ";
+        cout << "How much money would you like to bribe? (Current money: " << def.money << ") the higher the better chance: ";
         int bribeAmount = getValidInt();
 
         if (bribeAmount <= 0) {
             cout << "Invalid amount. Please enter a positive number.\n";
             return;
         }
-        else if (bribeAmount > money) {
+        else if (bribeAmount > def.money) {
             cout << "You don't have enough money to bribe that amount.\n";
             return;
         }
@@ -670,8 +691,11 @@ Prisonlist:
             cout << "You lost " << bribeAmount << " money.\n";
             MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", false);
             cout << "YOU ARE OUT OF PRISON!!!";
-            inprison = false;
-            HandleSave(saveFilePath, money, points, true);
+            def.inprison = false;
+            def.escapedPrison = true;
+            AchievementReachedCheck(def.money, def.points);
+            Sleep(1000);
+            HandleSave(def.saveFilePath, def.money, def.points, true);
             Game();
         }
         else
@@ -680,15 +704,18 @@ Prisonlist:
             goto Prisonlist;
         }
     }
-    else if (options == "Prisonbreak")
+    else if (options == "Prisonbreak" || options == "prisonbreak")
     {
         int chance = rand() % 101 + 1;
         if (chance <= 10)
         {
             MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", false);
             cout << "YOU ARE OUT OF PRISON!!!";
-            inprison = false;
-            HandleSave(saveFilePath, money, points, true);
+            def.inprison = false;
+            def.escapedPrison = true;
+            AchievementReachedCheck(def.money, def.points);
+            Sleep(1000);
+            HandleSave(def.saveFilePath, def.money, def.points, true);
             Game();
         }
         else
@@ -697,7 +724,7 @@ Prisonlist:
             goto Prisonlist;
         }
     }
-    else if (options == "Math")
+    else if (options == "Math" || options == "math")
     {
         while (true) {
             int randomNum1 = rand() % 901 + 100;
@@ -726,8 +753,11 @@ Prisonlist:
             if (playerAnswer == correctAnswer) {
                 MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", false);
                 cout << "YOU ARE OUT OF PRISON!!!";
-                inprison = false;
-                HandleSave(saveFilePath, money, points, true);
+                def.inprison = false;
+                def.escapedPrison = true;
+                AchievementReachedCheck(def.money, def.points);
+                Sleep(1000);
+                HandleSave(def.saveFilePath, def.money, def.points, true);
                 Game();
                 break;
             }
@@ -826,7 +856,7 @@ void ChildSupport(int& money, int& childsupportamount)
                 childsupportamount = 0;
                 cout << "Child support fully paid. Remaining money: " << money << "\n";
                 PlayActionSound();
-                AchievementReachedCheck(money, points);
+                AchievementReachedCheck(money, def.points);
             }
             else {
                 cout << "You do not have enough money to pay the full child support.\n";
@@ -867,29 +897,29 @@ void Game()
 #else
     system("clear");
 #endif
-    system("title Reaper's Cool Game");
+    system("title RgModLoader v1.0");
 
     AssetsFolder();
-
     HandleSupport();
+    cout << def.reaperGameEdition << endl;
 
-    if (system(("mkdir " + folderPath).c_str())) {}
+    if (system(("mkdir " + def.folderPath).c_str())) {}
 
     string autoload, autosave;
-    LoadSettings(autoload, autosave, settingsFilePath);
-    SetFontSize(fontSize);
+    LoadSettings(autoload, autosave, def.settingsFilePath);
+    SetFontSize(def.fontSize);
 
     if (autoload == "on") {
-        HandleLoad(saveFilePath, money, points);
+        HandleLoad(def.saveFilePath, def.money, def.points);
     }
     LoadAchievements();
-    AchievementReachedCheck(money, points);
+    AchievementReachedCheck(def.money, def.points);
     DisplayCommands();
 
     while (true)
-        if (!inprison)
+        if (!def.inprison)
         {
-            if (csamount == 15)
+            if (def.csamount == def.csRqToGoToPrison)
             {
                 Prison();
             }
@@ -899,17 +929,17 @@ void Game()
             if (command == "/help") DisplayCommands();
             else if (command == "/achievements") DisplayAchievements();
             else if (command == "/support") HandleSupport();
-            else if (command == "/transaction") HandleTransaction(money, points);
-            else if (command == "/playagame") HandlePlayAGame(money, points);
-            else if (command == "/save") HandleSave(saveFilePath, money, points, true);
-            else if (command == "/load") HandleLoad(saveFilePath, money, points);
-            else if (command == "/settings") Settings(autoload, autosave, settingsFilePath);
-            else if (command == "/gamble") HandleGamble(money);
-            else if (command == "/taxes") HandleTaxes(money, taxamount);
-            else if (command == "/childsupport") ChildSupport(money, csamount);
+            else if (command == "/transaction") HandleTransaction(def.money, def.points);
+            else if (command == "/playagame") HandlePlayAGame(def.money, def.points);
+            else if (command == "/save") HandleSave(def.saveFilePath, def.money, def.points, true);
+            else if (command == "/load") HandleLoad(def.saveFilePath, def.money, def.points);
+            else if (command == "/settings") Settings(autoload, autosave, def.settingsFilePath);
+            else if (command == "/gamble") HandleGamble(def.money);
+            else if (command == "/taxes") HandleTaxes(def.money, def.taxamount);
+            else if (command == "/childsupport") ChildSupport(def.money, def.csamount);
             else if (command == "/exit") {
                 if (autosave == "on") {
-                    HandleSave(saveFilePath, money, points, true);
+                    HandleSave(def.saveFilePath, def.money, def.points, true);
                 }
                 HandleExit();
                 string response;
@@ -927,42 +957,42 @@ void Game()
                 system("clear");
 #endif
                 HandleSupport();
-                LoadSettings(autoload, autosave, settingsFilePath);
-                SetFontSize(fontSize);
+                LoadSettings(autoload, autosave, def.settingsFilePath);
+                SetFontSize(def.fontSize);
                 if (autoload == "on") {
-                    HandleLoad(saveFilePath, money, points);
+                    HandleLoad(def.saveFilePath, def.money, def.points);
                 }
                 DisplayCommands();
             }
-            else if (command == "/points") HandlePoints(points);
-            else if (command == "/money") HandleMoney(money);
+            else if (command == "/points") HandlePoints(def.points);
+            else if (command == "/money") HandleMoney(def.money);
 
             else if (command == "/reaper")
             {
-                if (secretonefound == false)
+                if (def.secretonefound == false)
                 {
                     cout << "Guh, I guess you have found me\nI will give you 1000 money, i paid the taxes for you btw and np.\n";
-                    money += 1000;
-                    secretonefound = true;
-                    AchievementReachedCheck(money, points);
+                    def.money += 1000;
+                    def.secretonefound = true;
+                    AchievementReachedCheck(def.money, def.points);
                 }
                 else {
                     cout << "Bro STOP BEGGING ME FOR MONEY PLEASE BRUH...\n";
-                    begging = true;
-                    AchievementReachedCheck(money, points);
+                    def.begging = true;
+                    AchievementReachedCheck(def.money, def.points);
                 }
             }
             else if (command == "/kys")
             {
-                if (secrettwofound == false)
+                if (def.secrettwofound == false)
                 {
                     cout << "Did you just tell me to keep myself safe??? I am stealing your money\n";
-                    double moneystolen = money / 3;
+                    double moneystolen = def.money / 3;
                     moneystolen = ceil(moneystolen);
-                    money -= static_cast<int>(moneystolen);
+                    def.money -= static_cast<int>(moneystolen);
                     cout << "reaper just stole " << moneystolen << " money from you\n";
-                    secrettwofound = true;
-                    AchievementReachedCheck(money, points);
+                    def.secrettwofound = true;
+                    AchievementReachedCheck(def.money, def.points);
                 }
                 else {
                     cout << "Odd specimen\n";
@@ -1013,24 +1043,155 @@ void Game()
                     TypeEffect("MRATI: Learn how to respond you!!!", 70);
                 }
             }
+
+            //MOD COMMAND ALLOW LIST
+            else if (command == "/exampleboss")
+            {
+                reaperExampleMod.Bosses();
+            }
+            else if (command == "/playmath")
+            {
+                betterMathGamesMod.Load();
+            }
+
+
             else {
                     cout << "Invalid command. Type /help for available commands.\n";
             }
 
             if (autosave == "on") {
-                HandleSave(saveFilePath, money, points, false);
+                HandleSave(def.saveFilePath, def.money, def.points, false);
             }
         }
 }
-int main() {
-    srand(time(0)); //cant believe i accidently put this in a while(true) loop before lol
-    Game();
+
+struct Mods {
+    string name;
+    bool isEnabled;
+
+    Mods(string modName) : name(modName), isEnabled(false) {}
+};
+
+void SaveModSettings(const vector<Mods>& modList, const string& filePath) {
+    ofstream modFile(filePath);
+    if (modFile.is_open()) {
+        for (const auto& mod : modList) {
+            modFile << mod.name << " " << (mod.isEnabled ? "true" : "false") << endl;
+        }
+        modFile.close();
+        cout << "Mod settings saved to " << filePath << endl;
+    }
+    else {
+        cout << "Error opening file for writing mod settings.\n";
+    }
+}
+
+void LoadModSettings(vector<Mods>& modList, const string& filePath) {
+    ifstream modFile(filePath);
+    if (modFile.is_open()) {
+        string modName;
+        string status;
+        while (modFile >> modName >> status) {
+            for (auto& mod : modList) {
+                if (mod.name == modName) {
+                    mod.isEnabled = (status == "true");
+                }
+            }
+        }
+        modFile.close();
+    }
+}
+
+/*int main() {
+    system("title RgModLoader v1.0");
+    SetFontSize(def.fontSize);
+
+    cout << "Game and Modloader made by " << def.developerExName << "\n";
+    string filePath = "C:\\ReaperGame\\SaveData\\ModLoadList.txt";
+
+    vector<Mods> modList = {
+        Mods("ExampleMod"),
+        Mods("BetterMathGamesMod"),
+    };
+
+    LoadModSettings(modList, filePath);
+
+    def.modSet1 = modList[0].isEnabled;
+    def.modSet2 = modList[1].isEnabled;
+
+    reaperExampleMod.CheckEnable(def.modSet1);
+    betterMathGamesMod.CheckEnable(def.modSet2);
+
+    cout << "ModList:\n";
+    for (size_t i = 0; i < modList.size(); ++i) {
+        cout << i + 1 << ". " << modList[i].name << " [" << (modList[i].isEnabled ? "Enabled" : "Disabled") << "]\n";
+    }
+
+    char changeSettings;
+    do {
+        cout << "Would you like to change any settings? (y/n): ";
+        cin >> changeSettings;
+        if (changeSettings == 'y' || changeSettings == 'Y') {
+            int modChoice;
+            cout << "Select a mod to change enable/disable state (1-" << modList.size() << "): ";
+            cin >> modChoice;
+
+            while (cin.fail() || modChoice < 1 || modChoice > modList.size()) {
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                cout << "Invalid choice! Please select between 1-" << modList.size() << ": ";
+                cin >> modChoice;
+            }
+
+            cout << "Would you like to " << (modList[modChoice - 1].isEnabled ? "Disable" : "Enable")
+                << " " << modList[modChoice - 1].name << "? (y/n): ";
+            char confirm;
+            cin >> confirm;
+
+            if (confirm == 'y' || confirm == 'Y') {
+                modList[modChoice - 1].isEnabled = !modList[modChoice - 1].isEnabled;
+                cout << modList[modChoice - 1].name << " is now "
+                    << (modList[modChoice - 1].isEnabled ? "Enabled" : "Disabled") << ".\n";
+
+                if (modChoice == 1) def.modSet1 = modList[modChoice - 1].isEnabled;
+                if (modChoice == 2) def.modSet2 = modList[modChoice - 1].isEnabled;
+
+                SaveModSettings(modList, filePath);
+
+                if (modList[modChoice - 1].isEnabled) {
+                    if (modChoice == 1) reaperExampleMod.InitializeMod();
+                    if (modChoice == 2) betterMathGamesMod.InitializeMod();
+                }
+            }
+
+        }
+        else {
+            goto Start;
+        }
+        cout << "Want to make more changes? (y/n): ";
+        cin >> changeSettings;
+    } while (changeSettings == 'y' || changeSettings == 'Y');
+    Start:
+    reaperExampleMod.CheckEnable(def.modSet1);
+    betterMathGamesMod.CheckEnable(def.modSet2);
+    cout << "Start Game (y/n)? ";
+    char choice;
+    cin >> choice;
+
+    if (choice == 'y' || choice == 'Y') {
+        srand(static_cast<unsigned>(time(0)));
+        Game();
+    }
+    else {
+        cout << "Exiting...\n";
+    }
+
+    return 0;
 }
 
 
 
-
-
+*/
 
 
 
@@ -1045,7 +1206,6 @@ void Mrati() {
     int ratiHP = 70;
     int playerHP = 50;
     int playerPotions = 5;
-    int ratiPotions = 3;
     int money = 0;
 
         TypeEffect("MRATI: YOUR OPINION DOESNT MATTER TO A MAN LIKE ME!@#$%\n", 40);
@@ -1064,7 +1224,7 @@ void Mrati() {
             cout << "RATI Health: " + to_string(ratiHP) + "\n";
             cout << "Player Health: " + to_string(playerHP) + "\n\n";
 
-            cout << "Attack Options (case-sensitive):\n";
+            cout << "Attack Options:\n";
             cout << "Emotional Damage\n";
             cout << "Tax Forms\n";
             cout << "Child Support\n";
@@ -1078,7 +1238,7 @@ void Mrati() {
             int damageToRat = rand() % 11 + 1;
             int chance = rand() % 101 + 1;
 
-            if (input == "Emotional Damage") {
+            if (input == "Emotional Damage" || input == "emotional damage") {
                 TypeEffect("Rolling Dice...\n", 60);
                 Sleep(400);
                 TypeEffect("Dice came out as... " + to_string(damageToRat) + " damage!\n", 60);
@@ -1095,7 +1255,7 @@ void Mrati() {
                     Sleep(2000);
                 }
             }
-            else if (input == "Tax Forms") {
+            else if (input == "Tax Forms" || input == "tax forms") {
                 TypeEffect("Rolling Dice...\n", 60);
                 Sleep(400);
                 TypeEffect("Dice came out as... " + to_string(damageToRat) + " damage!\n", 60);
@@ -1112,7 +1272,7 @@ void Mrati() {
                     Sleep(2000);
                 }
             }
-            else if (input == "Child Support") {
+            else if (input == "Child Support" || input == "child support") {
                 TypeEffect("Rolling Dice...\n", 60);
                 Sleep(400);
                 TypeEffect("Dice came out as... " + to_string(damageToRat) + " damage!\n", 60);
@@ -1129,7 +1289,55 @@ void Mrati() {
                     Sleep(2000);
                 }
             }
-            else if (input == "Heal") {
+            if (input == "Attack Options" || input == "attack options")
+            {
+                const string rainbowColors[] = {
+                    "\033[31m", //Red
+                    "\033[32m", //Green
+                    "\033[33m", //Yellow
+                    "\033[34m", //Blue
+                    "\033[35m"  //Magenta
+                };
+
+                int colorIndex = 0;
+                auto CycleColor = [&]() {
+                    cout << rainbowColors[colorIndex];
+                    colorIndex = (colorIndex + 1) % 5;
+                    };
+
+                CycleColor();
+                TypeEffect("Rolling Special Dice...\n", 60);
+                this_thread::sleep_for(chrono::milliseconds(400));
+
+                CycleColor();
+                TypeEffect("Special Dice came out as... " + to_string(damageToRat * 2) + " damage!\n", 60);
+
+                if (chance <= 10)
+                {
+                    CycleColor();
+                    TypeEffect("BUT WAIT... Rati is sigma and you missed...\n", 60);
+
+                    CycleColor();
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                }
+                else
+                {
+                    ratiHP -= damageToRat *= 2;
+
+                    CycleColor();
+                    TypeEffect(to_string(damageToRat) + " damage done to rati...\n", 60);
+
+                    CycleColor();
+                    TypeEffect("Rati has: " + to_string(ratiHP) + " HP left.\n", 60);
+
+                    CycleColor();
+                    TypeEffect("RATI'S TURN!!!\n\n", 30);
+                    this_thread::sleep_for(chrono::milliseconds(2000));
+                }
+
+                cout << "\033[0m"; //reset
+            }
+            else if (input == "Heal" || input == "heal") {
                 if (playerPotions > 0) {
                     playerHP += 20;
                     playerPotions--;
@@ -1172,10 +1380,14 @@ void Mrati() {
             TypeEffect("Rati has been defeated! You win!\n", 60);
             TypeEffect("You won 5,000 money\n", 60);
             money += 5000;
+            def.beatRati = true;
+            AchievementReachedCheck(money, def.points);
             Sleep(1000);
+            cout << "type /help for commands\n";
         }
         else if (playerHP <= 0) {
             TypeEffect("You have been defeated by Rati... Game Over!\n", 60);
             Sleep(1000);
+            cout << "type /help for commands\n";
         }
     }

@@ -132,7 +132,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BetterMathGamesMod.cpp" />
+    <ClCompile Include="Defaults.cpp" />
+    <ClCompile Include="ExampleMod.cpp" />
+    <ClCompile Include="Mod.cpp" />
     <ClCompile Include="ReaperGame.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BetterMathGamesMod.h" />
+    <ClInclude Include="Defaults.h" />
+    <ClInclude Include="ExampleMod.h" />
+    <ClInclude Include="Mod.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
