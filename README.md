@@ -19,3 +19,13 @@ Some assets made by Suno ai because of funny
 Also credits to mrati to making the asset mrati.mp3
 
 Also credits to me to making the game :D
+
+# For Mod Makers
+
+Make sure to include Dafaults.h in your mods .cpp file
+
+Make sure to include Mod.h in your mods .h file
+
+Defaults.h comes with almost everything you can really edit in the game
+
+You can use ReaperGame.cs to debug
