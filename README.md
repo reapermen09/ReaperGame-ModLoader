@@ -29,7 +29,7 @@ You can use ReaperGame.cs to debug
 
 Publicity and unpublicity form:
 
-https://docs.google.com/forms/d/e/1FAIpQLSd7-FG91tV1m6xZJTMrDgcjs6nf-BGRHbdWekzGNa2q9qKU4A/viewform?usp=dialog
+https://docs.google.com/forms/d/e/1FAIpQLSd7-FG91tV1m6xZJTMrDgcjs6nf-BGRHbdWekzGNa2q9qKU4A/viewform?usp=sharing
 
 Terms:
 
