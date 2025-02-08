@@ -29,3 +29,11 @@ Make sure to include Mod.h in your mods .h file
 Defaults.h comes with almost everything you can really edit in the game
 
 You can use ReaperGame.cs to debug
+
+Publicity and unpublicity form:
+
+https://docs.google.com/forms/d/e/1FAIpQLSd7-FG91tV1m6xZJTMrDgcjs6nf-BGRHbdWekzGNa2q9qKU4A/viewform?usp=dialog
+
+Terms:
+
+https://github.com/reapermen09/ReaperGame-ModLoader/blob/main/RgMLTerms.txt
