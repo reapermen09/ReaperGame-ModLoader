@@ -6,6 +6,4 @@ Any malicous files will not be put in the mod and may be reported.
 
 You may not use any assets that are not yours without permission and proof of permission
 
-Any assets file has to have proof that you made it
-
 You are allowed to use AI for assets and code
