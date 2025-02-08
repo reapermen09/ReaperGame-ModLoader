@@ -14,4 +14,6 @@ https://github.com/reapermen09/ReaperGame-ModLoader/tree/main/Versions
 2. Load the game (will create a Folder named "ReaperGame" in C:/)
 3. Move the Assets folder to C:/ReaperGame
 
-Assets made by Suno ai because of funny
+Some assets made by Suno ai because of funny
+Also credits to mrati to making the asset mrati.mp3
+Also credits to me to making the game :D
