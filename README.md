@@ -1,5 +1,4 @@
-# ReaperGame Mod Loader
-# RgML
+# ReaperGame Mod Loader (RgML)
 
 ## Downloads:
 ### Latest:
