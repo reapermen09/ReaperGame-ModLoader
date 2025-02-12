@@ -17,7 +17,9 @@ Also credits to mrati to making the asset mrati.mp3
 
 Also credits to me to making the game :D
 
-# For Mod Makers
+# For Mod Makers or people wanting Mods
+
+You may request a Mod/Mod idea in the google forms below!
 
 Make sure to include Dafaults.h in your mods .cpp file
 
