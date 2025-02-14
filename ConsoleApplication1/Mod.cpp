@@ -5,7 +5,7 @@
 #include "Defaults.h"
 #pragma comment(lib, "C:\\cstuff\\bass24\\c\\x64\\bass.lib")
 
-///Enable/Disable mod
+///Enable/Disable mod DO NOT set developer credits here
 void Mod::CheckEnable(bool set) {
     modEnabled = set;
 }
@@ -14,20 +14,20 @@ void Mod::CheckEnable(bool set) {
 void Mod::EnsureSaveDirectory(bool Notify) {
     DWORD ftyp = GetFileAttributesA(def.folderPath.c_str());
     if (ftyp == INVALID_FILE_ATTRIBUTES || !(ftyp & FILE_ATTRIBUTE_DIRECTORY)) {
-        cout << "Save directory doesn't exist. Creating: " << def.folderPath << endl;
+        std::cout << "Save directory doesn't exist. Creating: " << def.folderPath << std::endl;
         if (!CreateDirectoryA(def.folderPath.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS) {
-            cerr << "Failed to create directory! Error Code: " << GetLastError() << endl;
+            std::cerr << "Failed to create directory! Error Code: " << GetLastError() << std::endl;
         }
     }
 }
 
 ///Special typing effect! delay_ms is how long it takes to write out
-void Mod::Type(const string& text, int delay_ms) {
+void Mod::Type(const std::string& text, int delay_ms) {
     for (char c : text) {
-        cout << c << flush;
-        this_thread::sleep_for(chrono::milliseconds(delay_ms));
+        std::cout << c << std::flush;
+        std::this_thread::sleep_for(std::chrono::milliseconds(delay_ms));
     }
-    cout << endl;
+    std::cout << std::endl;
 }
 
 ///Checks file existance
@@ -74,32 +74,32 @@ void Mod::Music(const char* mp3File, bool playstop) {
 
 ///Loads game data
 void Mod::HandleLoad() {
-    ifstream loadFile(def.saveFilePath);
+    std::ifstream loadFile(def.saveFilePath);
     if (loadFile.is_open()) {
-        string line;
-        if (getline(loadFile, line)) def.money = stoi(line);
-        if (getline(loadFile, line)) def.points = stoi(line);
-        if (getline(loadFile, line)) def.taxamount = stoi(line);
-        if (getline(loadFile, line)) def.secretonefound = stoi(line);
-        if (getline(loadFile, line)) def.secrettwofound = stoi(line);
-        if (getline(loadFile, line)) def.csamount = stoi(line);
-        if (getline(loadFile, line)) def.inprison = stoi(line);
+        std::string line;
+        if (getline(loadFile, line)) def.money = std::stoi(line);
+        if (getline(loadFile, line)) def.points = std::stoi(line);
+        if (getline(loadFile, line)) def.taxamount = std::stoi(line);
+        if (getline(loadFile, line)) def.secretonefound = std::stoi(line);
+        if (getline(loadFile, line)) def.secrettwofound = std::stoi(line);
+        if (getline(loadFile, line)) def.csamount = std::stoi(line);
+        if (getline(loadFile, line)) def.inprison = std::stoi(line);
 
-        cout << "Game loaded! (Money: " << def.money << "), (Points: " << def.points << "), (Taxes needed to pay: " << def.taxamount << "), (Child support you owe: " << def.csamount << ")\n";
+        std::cout << "Game loaded! (Money: " << def.money << "), (Points: " << def.points << "), (Taxes needed to pay: " << def.taxamount << "), (Child support you owe: " << def.csamount << ")\n";
     }
     else {
-        cout << "No saved game found.\n";
+        std::cout << "No saved game found.\n";
     }
 }
 
 ///Saves game data
 void Mod::HandleSave() {
-    ofstream saveFile(def.saveFilePath, ios::out | ios::trunc);
+    std::ofstream saveFile(def.saveFilePath, std::ios::out | std::ios::trunc);
     if (saveFile.is_open()) {
-        saveFile << def.money << "\n" << def.points << "\n" << def.taxamount << "\n" << def.secretonefound << "\n" << def.secrettwofound << "\n" << def.csamount << "\n" << def.inprison << endl;
+        saveFile << def.money << "\n" << def.points << "\n" << def.taxamount << "\n" << def.secretonefound << "\n" << def.secrettwofound << "\n" << def.csamount << "\n" << def.inprison << std::endl;
     }
     else {
-        cout << "Error saving game.\n";
+        std::cout << "Error saving game.\n";
     }
 }
 
@@ -138,3 +138,9 @@ void Mod::Load() {}
 
 ///See mod description (does not need a mod enable check)
 void Mod::ModDescription() {}
+
+///Checks the execution of a command
+bool Mod::CommandUsed() { return false; }
+
+/// Set your developer name
+std::string Mod::Developer(std::string developer) { return developer; }

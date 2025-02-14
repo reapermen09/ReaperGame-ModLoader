@@ -15,6 +15,7 @@ public:
     void ModifyAchievements() override;
     void ModAchievementDisplay() override;
     void ModDescription() override;
+    bool CommandUsed() override;
 };
 
 #endif

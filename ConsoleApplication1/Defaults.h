@@ -16,6 +16,7 @@ public:
     int money = 10;
     int points = 0;
     int csRqToGoToPrison = 15;
+    std::string command;
     const std::string developerName = "Reaper";
     const std::string developerExName = "Reaperman";
     std::string folderPath = "C:\\ReaperGame\\SaveData";

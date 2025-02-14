@@ -11,6 +11,7 @@ public:
     void CommandList() override;
     void Load() override;
     void ModDescription() override;
+    bool CommandUsed() override;
 };
 
 #endif
