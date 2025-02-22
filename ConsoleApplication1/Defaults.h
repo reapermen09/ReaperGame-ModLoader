@@ -5,17 +5,17 @@
 
 class Defaults {
 public:
-    int taxamount = 0;
-    int csamount = 0;
+    long taxamount = 0;
+    long csamount = 0;
     int fontSize = 3;
     bool inprison = false;
     bool secretonefound = false;
     bool secrettwofound = false;
     bool beatRati = false;
     bool begging = false;
-    int money = 10;
-    int points = 0;
-    int csRqToGoToPrison = 15;
+    long money = 10;
+    long points = 0;
+    long csRqToGoToPrison = 15;
     std::string command;
     const std::string developerName = "Reaper";
     const std::string developerExName = "Reaperman";

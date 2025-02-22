@@ -103,7 +103,7 @@ void ArithmeticOperations(int minRandom, int maxRandom) {
         def.money += abs(ceil(num2 / 4)) + 1;
         std::cout << "Your money increased by " << ceil(1 + (num2/4)) << std::endl;
         double tax = abs(ceil(num2 / 8));
-        def.taxamount += static_cast<int>(tax);
+        def.taxamount += static_cast<long>(tax);
         def.csamount += 1;
     }
     else {
@@ -157,7 +157,7 @@ void PlayGame() {
                 def.money += abs(ceil(area / 4)) + 1;
                 std::cout << "Your money increased by " << abs(ceil(1 + (area / 4))) + 1 << std::endl;
                 double tax = abs(ceil(area / 9));
-                def.taxamount += static_cast<int>(tax);
+                def.taxamount += static_cast<long>(tax);
                 def.csamount += 1;
             }
             else {
@@ -186,7 +186,7 @@ void PlayGame() {
                 def.money += abs(ceil(area / 3));
                 std::cout << "Your money increased by " << abs(ceil(1 + (area / 3))) + 1 << std::endl;
                 double tax = abs(ceil(area / 8));
-                def.taxamount += static_cast<int>(tax);
+                def.taxamount += static_cast<long>(tax);
                 def.csamount += 1;
             }
             else {
@@ -216,7 +216,7 @@ void PlayGame() {
                 def.money += abs(ceil(hypotenuse * 2.5)) + 1;
                 std::cout << "Your money increased by " << abs(ceil(1 + (hypotenuse * 2.5))) + 1 << std::endl;
                 double tax = abs(ceil(hypotenuse));
-                def.taxamount += static_cast<int>(tax);
+                def.taxamount += static_cast<long>(tax);
                 def.csamount += 1;
             }
             else {
