@@ -756,7 +756,6 @@ void Game()
 #else
     system("clear");
 #endif
-    system("title RgModLoader v1.2");
 
     AssetsFolder();
     HandleSupport();
@@ -980,7 +979,7 @@ bool GetYesNoInput(const std::string& prompt) {
 }
 
 int main() {
-    system("title RgModLoader v1.1");
+    system("title RgModLoader v1.2");
     SetFontSize(def.fontSize);
 
     std::cout << "Game and Modloader made by " << def.developerExName << "\n";
