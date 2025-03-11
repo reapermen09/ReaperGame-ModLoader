@@ -5,7 +5,7 @@
 #include "Defaults.h"
 
 #undef max;
-BetterMathGamesMod::BetterMathGamesMod() { CheckEnable(def.modSet2); }
+BetterMathGamesMod::BetterMathGamesMod() { CheckEnable(def.modSet[1]); }
 
 void BetterMathGamesMod::ModifyAttributes() {
     if (!modEnabled) {

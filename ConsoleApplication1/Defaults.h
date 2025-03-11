@@ -7,7 +7,7 @@ class Defaults {
 public:
     long taxamount = 0;
     long csamount = 0;
-    int fontSize = 3;
+    short fontSize = 3;
     bool inprison = false;
     bool secretonefound = false;
     bool secrettwofound = false;
@@ -23,7 +23,7 @@ public:
     std::string saveFilePath = folderPath + "\\game_save.txt";
     std::string settingsFilePath = folderPath + "\\settings.txt";
     std::string achievementsFilePath = folderPath + "\\achievements.txt";
-    std::string reaperGameEdition = "You are using C++ RgModLoader Edition";
+    const std::string reaperGameEdition = "You are using C++ RgModLoader Edition";
 
     bool money100 = false;
     bool money1000 = false;
@@ -46,8 +46,7 @@ public:
     bool donotcheck = false;
     bool donotcheck2 = false;
 
-    bool modSet1;
-    bool modSet2;
+    bool modSet[];
 };
 extern Defaults def;
 

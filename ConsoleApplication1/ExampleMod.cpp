@@ -8,7 +8,7 @@ bool beatReaper = false;
 bool beatenRati = false;
 bool reaperHasBeenBeaten = false;
 bool inboss = false;
-ExampleMod::ExampleMod() { CheckEnable(def.modSet1); }
+ExampleMod::ExampleMod() { CheckEnable(def.modSet[0]); }
 
 void ExampleMod::ModifyAttributes() {
     if (!modEnabled) {
@@ -127,15 +127,14 @@ void ExampleMod::Bosses()
         Music("C:\\ReaperGame\\Assets\\gamble.mp3", true);
         inboss = true;
         int reaperHP = 120;
-        int playerHP; //declare before checking if rati has been defeated
-        //loads normal achievements 
+        int playerHP;
+
         std::ifstream achievementsFile("C:\\ReaperGame\\SaveData\\achievements.txt");
         if (achievementsFile.is_open()) {
             std::string line;
             int lineNumber = 0;
             while (getline(achievementsFile, line)) {
                 lineNumber++;
-                //specifically checks if you have bean rati
                 if (lineNumber == 19) {
                     std::istringstream(line) >> beatenRati;
                     break;
@@ -185,11 +184,11 @@ void ExampleMod::Bosses()
 
                 if (chance <= 10) {
                     Type("BUT WAIT... You have missed and caused no emotional damage...\n", 60);
-                    Type("RATI'S TURN!!!\n\n", 30);
+                    Type("REAPERS'S TURN!!!\n\n", 30);
                 }
                 else {
                     reaperHP -= damageToReaper;
-                    Type(std::to_string(damageToReaper) + " emotional damage done to rati... \n", 60);
+                    Type(std::to_string(damageToReaper) + " emotional damage done to Reaper... \n", 60);
                     Type("Reaper has: " + std::to_string(reaperHP) + " HP left. Cry... \n", 60);
                     Type("REAPER'S TURN!!!\n\n", 30);
                     Sleep(2000);

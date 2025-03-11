@@ -756,7 +756,7 @@ void Game()
 #else
     system("clear");
 #endif
-    system("title RgModLoader v1.1");
+    system("title RgModLoader v1.2");
 
     AssetsFolder();
     HandleSupport();
@@ -944,86 +944,97 @@ void LoadModSettings(std::vector<Mods>& modList, const std::string& filePath) {
     }
 }
 
+#include <iostream>
+#include <vector>
+#include <limits>
+#include <ctime>
+
+void DisplayModList(const std::vector<Mods>& modList) {
+    std::cout << "ModList:\n";
+    for (size_t i = 0; i < modList.size(); ++i) {
+        std::cout << i + 1 << ". " << modList[i].name << " ["
+            << (modList[i].isEnabled ? "Enabled" : "Disabled") << "]\n";
+    }
+}
+
+int GetValidModChoice(size_t modCount) {
+    int choice;
+    while (true) {
+        std::cout << "Select a mod to toggle (1-" << modCount << "): ";
+        std::cin >> choice;
+
+        if (!std::cin.fail() && choice >= 1 && choice <= static_cast<int>(modCount)) {
+            return choice - 1;
+        }
+        std::cin.clear();
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        std::cout << "Invalid choice! Try again.\n";
+    }
+}
+
+bool GetYesNoInput(const std::string& prompt) {
+    char input;
+    std::cout << prompt << " (y/n): ";
+    std::cin >> input;
+    return (input == 'y' || input == 'Y');
+}
+
 int main() {
     system("title RgModLoader v1.1");
     SetFontSize(def.fontSize);
 
     std::cout << "Game and Modloader made by " << def.developerExName << "\n";
     std::cout << "Credits List: NOT DONE YET\n";
-    std::string filePath = "C:\\ReaperGame\\SaveData\\ModLoadList.txt";
 
-    std::vector<Mods> modList = {
-        Mods("ExampleMod"),
-        Mods("BetterMathGamesMod"),
+    std::string filePath = "C:\\ReaperGame\\SaveData\\ModLoadList.txt";
+    std::vector<Mods> modList = { 
+        Mods("ExampleMod"), 
+        Mods("BetterMathGamesMod") 
     };
 
     LoadModSettings(modList, filePath);
 
-    def.modSet1 = modList[0].isEnabled;
-    def.modSet2 = modList[1].isEnabled;
+    for (size_t i = 0; i < modList.size(); ++i) {
+        def.modSet[i] = modList[i].isEnabled;
+    }
 
-    reaperExampleMod.CheckEnable(def.modSet1);
-    betterMathGamesMod.CheckEnable(def.modSet2);
+    reaperExampleMod.CheckEnable(def.modSet[0]);
+    betterMathGamesMod.CheckEnable(def.modSet[1]);
 
-    std::cout << "ModList:\n";
-    for (size_t i = 0; i < modList.size(); ++i) std::cout << i + 1 << ". " << modList[i].name << " [" << (modList[i].isEnabled ? "Enabled" : "Disabled") << "]\n";
+    DisplayModList(modList);
 
-    char changeSettings;
-    do {
-        std::cout << "Would you like to change any settings? (y/n): ";
-        std::cin >> changeSettings;
-        if (changeSettings == 'y' || changeSettings == 'Y') {
-            int modChoice;
-            std::cout << "Select a mod to change enable/disable state (1-" << modList.size() << "): ";
-            std::cin >> modChoice;
+    while (GetYesNoInput("Would you like to change any settings?")) {
+        int modIndex = GetValidModChoice(modList.size());
 
-            while (std::cin.fail() || modChoice < 1 || modChoice > modList.size()) {
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                std::cout << "Invalid choice! Please select between 1-" << modList.size() << ": ";
-                std::cin >> modChoice;
+        if (GetYesNoInput("Would you like to " +
+            std::string(modList[modIndex].isEnabled ? "Disable" : "Enable") +
+            " " + modList[modIndex].name + "?"))
+        {
+            modList[modIndex].isEnabled = !modList[modIndex].isEnabled;
+            def.modSet[modIndex] = modList[modIndex].isEnabled;
+
+            std::cout << modList[modIndex].name << " is now "
+                << (modList[modIndex].isEnabled ? "Enabled" : "Disabled") << ".\n";
+
+            SaveModSettings(modList, filePath);
+
+            if (modList[modIndex].isEnabled) {
+                if (modIndex == 0) reaperExampleMod.InitializeMod();
+                if (modIndex == 1) betterMathGamesMod.InitializeMod();
             }
-
-            std::cout << "Would you like to " << (modList[modChoice - 1].isEnabled ? "Disable" : "Enable")
-                << " " << modList[modChoice - 1].name << "? (y/n): ";
-            char confirm;
-            std::cin >> confirm;
-
-            if (confirm == 'y' || confirm == 'Y') {
-                modList[modChoice - 1].isEnabled = !modList[modChoice - 1].isEnabled;
-                std::cout << modList[modChoice - 1].name << " is now "
-                    << (modList[modChoice - 1].isEnabled ? "Enabled" : "Disabled") << ".\n";
-
-                if (modChoice == 1) def.modSet1 = modList[modChoice - 1].isEnabled;
-                if (modChoice == 2) def.modSet2 = modList[modChoice - 1].isEnabled;
-
-                SaveModSettings(modList, filePath);
-
-                if (modList[modChoice - 1].isEnabled) {
-                    if (modChoice == 1) reaperExampleMod.InitializeMod();
-                    if (modChoice == 2) betterMathGamesMod.InitializeMod();
-                }
-            }
-
         }
-        else goto Start;
-        std::cout << "Want to make any more changes? (y/n): ";
-        std::cin >> changeSettings;
-    } 
-    while (changeSettings == 'y' || changeSettings == 'Y');
-    Start:
-    reaperExampleMod.CheckEnable(def.modSet1);
-    betterMathGamesMod.CheckEnable(def.modSet2);
-    std::cout << "Start Game (y/n)? ";
-    char choice;
-    std::cin >> choice;
+    }
 
-    if (choice == 'y' || choice == 'Y') 
-    {
+    reaperExampleMod.CheckEnable(def.modSet[0]);
+    betterMathGamesMod.CheckEnable(def.modSet[1]);
+
+    if (GetYesNoInput("Start Game?")) {
         srand(static_cast<unsigned>(time(0)));
         Game();
     }
-    else std::cout << "Exiting Modloader...\n";
+    else {
+        std::cout << "Exiting Modloader...\n";
+    }
 
     return 0;
 }
