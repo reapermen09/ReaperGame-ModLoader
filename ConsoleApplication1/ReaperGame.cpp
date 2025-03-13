@@ -105,7 +105,7 @@ int getValidLong() {
 }
 
 void SaveAchievements() {
-    std::ofstream achievementsFile(def.achievementsFilePath);
+    std::ofstream achievementsFile(def.achievementsFile);
     if (achievementsFile.is_open()) {
         bool* achievements[] = {
             &def.money100, &def.money1000, &def.money10000, &def.money100000, &def.money1000000,
@@ -124,7 +124,7 @@ void SaveAchievements() {
     reaperExampleMod.ModAchievementSave();
 }
 void LoadAchievements() {
-    std::ifstream achievementsFile(def.achievementsFilePath);
+    std::ifstream achievementsFile(def.achievementsFile);
     if (achievementsFile.is_open()) {
         bool* achievements[] = {
             &def.money100, &def.money1000, &def.money10000, &def.money100000, &def.money1000000,
@@ -189,7 +189,7 @@ void PlayActionSound() {
     PlaySound(TEXT("C:\\ReaperGame\\Assets\\action.wav"), NULL, SND_FILENAME | SND_ASYNC);
 }
 
-void AchievementReachedCheck(int money, int points) {
+void AchievementReachedCheck(long money, long points) {
     struct Achievement {
         int threshold;
         bool& unlocked;
@@ -272,7 +272,7 @@ void DisplayCommands() {
         "/childsupport - Pay your child support",
         "/exit - Exit game",
         "/clear - Clears all text (keeps commands)",
-        "/checkdesc[ModNameHere] - You can see the real mod name in the ModLoader menu in ModList (has to be enabled)"
+        "/checkdesc[ModNameHere] - [not implemented] You can see the real mod name in the ModLoader menu in ModList (has to be enabled)"
     };
 
     std::cout << "\nAvailable commands:\n";
@@ -550,11 +550,11 @@ void HandleGamble(long& money) {
 void Game(); //needed a declaration thanks so much w3schools for the help :3
 
 void Prison() {
-    MP3Silently("C:\\ReaperGame\\Assets\\prison.mp3", true);
+    MP3Silently("C:\ReaperGame\Assets\prison.mp3", true);
     def.inprison = true;
-    def.csamount = 0;
     def.wentToPrison = true;
-    HandleSave(def.saveFilePath, def.money, def.points, true);
+    def.prisonSession = true;
+    HandleSave(def.saveFile, def.money, def.points, true);
 
 #ifdef _WIN32
     system("cls");
@@ -575,13 +575,13 @@ void Prison() {
             << "1. Math (Medium but free)\n"
             << "2. Bribery (Easy but costs money)\n"
             << "3. Prisonbreak (Hard but free)\n"
-            << "Choose an option: ";
+            << "Choose an option: (ex: 1, 2, or 3)";
 
         std::string option;
         std::cin >> option;
         std::transform(option.begin(), option.end(), option.begin(), ::tolower);
 
-        if (option == "bribery") {
+        if (option == "bribery" || option == "2") {
             if (def.money <= 0) {
                 std::cout << "You don't have enough money to bribe.\n";
                 continue;
@@ -598,17 +598,21 @@ void Prison() {
                 def.money -= bribeAmount;
                 std::cout << "You lost " << bribeAmount << " money.\nYOU ARE OUT OF PRISON!!!\n";
                 def.inprison = false;
+                def.csamount = 0;
+                return;
             }
             else std::cout << "Your bribe was declined...\n";
         }
-        else if (option == "prisonbreak") {
+        else if (option == "prisonbreak" || option == "3") {
             if ((rand() % 101) < 10) {
                 std::cout << "YOU ARE OUT OF PRISON!!!\n";
                 def.inprison = false;
+                def.csamount = 0;
+                return;
             }
             else std::cout << "You failed to escape...\n";
         }
-        else if (option == "math") {
+        else if (option == "math" || option == "1") {
             while (true) {
                 int num1 = rand() % 901 + 100, num2 = rand() % 901 + 100, answer;
                 std::string operation;
@@ -631,7 +635,8 @@ void Prison() {
                 if (getValidInt() == answer) {
                     std::cout << "YOU ARE OUT OF PRISON!!!\n";
                     def.inprison = false;
-                    break;
+                    def.csamount = 0;
+                    return;
                 }
                 else {
                     std::cout << "Wrong answer! Try again? (y/n): ";
@@ -648,7 +653,7 @@ void Prison() {
     def.escapedPrison = true;
     AchievementReachedCheck(def.money, def.points);
     Sleep(1000);
-    HandleSave(def.saveFilePath, def.money, def.points, true);
+    HandleSave(def.saveFile, def.money, def.points, true);
     Game();
 }
 
@@ -761,23 +766,30 @@ void Game()
     HandleSupport();
     std::cout << def.reaperGameEdition << std::endl;
 
-    if (system(("mkdir " + def.folderPath).c_str())) {}
+    if (system(("mkdir " + def.saveDataFolderPath).c_str())) {}
 
     std::string autoload, autosave;
-    LoadSettings(autoload, autosave, def.settingsFilePath);
+    LoadSettings(autoload, autosave, def.settingsFile);
     SetFontSize(def.fontSize);
 
     if (autoload == "on") {
-        HandleLoad(def.saveFilePath, def.money, def.points);
+        HandleLoad(def.saveFile, def.money, def.points);
     }
     LoadAchievements();
     AchievementReachedCheck(def.money, def.points);
     DisplayCommands();
 
     while (true)
-        if (!def.inprison)
+        if (def.inprison)
         {
-            if (def.csamount == def.csRqToGoToPrison) Prison();
+            if (!def.prisonSession)
+            {
+                Prison();
+            }
+        }
+        else
+        {
+            if (def.csamount >= def.csRqToGoToPrison && !def.inprison) Prison();
             //commands
             std::cin >> def.command;
             std::transform(def.command.begin(), def.command.end(), def.command.begin(), ::tolower);
@@ -786,16 +798,38 @@ void Game()
             else if (def.command == "/support") HandleSupport();
             else if (def.command == "/transaction") HandleTransaction(def.money, def.points);
             else if (def.command == "/playagame") HandlePlayAGame(def.money, def.points);
-            else if (def.command == "/save") HandleSave(def.saveFilePath, def.money, def.points, true);
-            else if (def.command == "/load") HandleLoad(def.saveFilePath, def.money, def.points);
-            else if (def.command == "/settings") Settings(autoload, autosave, def.settingsFilePath);
+            else if (def.command == "/save") HandleSave(def.saveFile, def.money, def.points, true);
+            else if (def.command == "/load") HandleLoad(def.saveFile, def.money, def.points);
+            else if (def.command == "/settings") Settings(autoload, autosave, def.settingsFile);
             else if (def.command == "/gamble") HandleGamble(def.money);
             else if (def.command == "/taxes") HandleTaxes(def.money, def.taxamount);
             else if (def.command == "/childsupport") ChildSupport(def.money, def.csamount);
 
+
+
+
+            //--------------------
+            //Description Commands ISSUES HERE
+            else if (def.command == "/checkdesc[ExampleMod]")
+            {
+                reaperExampleMod.ModDescription();
+            }
+            else if (def.command == "/checkdesc[BetterMathGamesMod]")
+            {
+                betterMathGamesMod.ModDescription();
+            }
+
+            //MOD COMMAND ALLOW LIST
+            else if (reaperExampleMod.CommandUsed());
+            else if (betterMathGamesMod.CommandUsed());
+            //---------------------
+
+
+
+
             else if (def.command == "/exit") 
             {
-                if (autosave == "on") HandleSave(def.saveFilePath, def.money, def.points, true);
+                if (autosave == "on") HandleSave(def.saveFile, def.money, def.points, true);
                 HandleExit();
             }
             else if (def.command == "/clear")
@@ -806,9 +840,9 @@ void Game()
                 system("clear");
 #endif
                 HandleSupport();
-                LoadSettings(autoload, autosave, def.settingsFilePath);
+                LoadSettings(autoload, autosave, def.settingsFile);
                 SetFontSize(def.fontSize);
-                if (autoload == "on") HandleLoad(def.saveFilePath, def.money, def.points);
+                if (autoload == "on") HandleLoad(def.saveFile, def.money, def.points);
                 DisplayCommands();
             }
             else if (def.command == "/points") HandlePoints(def.points);
@@ -864,7 +898,7 @@ void Game()
                     TypeEffect("MRATI: Learn how to respond you!!!", 70);
                     goto Story;
                 }
-            Story:
+                Story:
                 TypeEffect("MRATI: Anyways... I was a crocodile once bit by an evil rat!\n", 70);
                 TypeEffect("MRATI: This is why I love joe biden he is so awesome! :3\n", 70);
                 TypeEffect("MRATI: This is why I am a rat...\n", 70);
@@ -885,25 +919,11 @@ void Game()
                 }
                 else TypeEffect("MRATI: Learn how to respond you!!!", 70);
             }
-            /*
-            //Description Commands ISSUES HERE
-            else if (def.command == "/checkdesc[ExampleMod]")
-            {
-                reaperExampleMod.ModDescription();
-            }
-            else if (def.command == "/checkdesc[bettermathdamesmod]")
-            {
-                betterMathGamesMod.ModDescription();
-            }
-            */
-            //MOD COMMAND ALLOW LIST
-            else if (reaperExampleMod.CommandUsed());
-            else if (betterMathGamesMod.CommandUsed());
 
             else std::cout << "Invalid command. Type /help for available commands.\n";
 
             if (autosave == "on") {
-                HandleSave(def.saveFilePath, def.money, def.points, false);
+                HandleSave(def.saveFile, def.money, def.points, false);
             }
         }
 }
@@ -943,11 +963,6 @@ void LoadModSettings(std::vector<Mods>& modList, const std::string& filePath) {
     }
 }
 
-#include <iostream>
-#include <vector>
-#include <limits>
-#include <ctime>
-
 void DisplayModList(const std::vector<Mods>& modList) {
     std::cout << "ModList:\n";
     for (size_t i = 0; i < modList.size(); ++i) {
@@ -979,7 +994,7 @@ bool GetYesNoInput(const std::string& prompt) {
 }
 
 int main() {
-    system("title RgModLoader v1.2");
+    system("title RgModLoader v1.2.1");
     SetFontSize(def.fontSize);
 
     std::cout << "Game and Modloader made by " << def.developerExName << "\n";
@@ -1048,16 +1063,15 @@ int main() {
 int ratiHP = 20;
 int playerHP = 50;
 int playerPotions = 5;
-int money = 0;
 
 
 void CheckRatiDeath()
 {
         TypeEffect("Rati has been defeated! You win!\n", 60);
         TypeEffect("You won 5,000 money\n", 60);
-        money += 5000;
+        def.money += 5000;
         def.beatRati = true;
-        AchievementReachedCheck(money, def.points);
+        AchievementReachedCheck(def.money, def.points);
         Sleep(1000);
         std::cout << "type /help for commands\n";
         return;

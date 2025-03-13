@@ -12,10 +12,10 @@ void Mod::CheckEnable(bool set) {
 
 ///Checks existance of the save file
 void Mod::EnsureSaveDirectory(bool Notify) {
-    DWORD ftyp = GetFileAttributesA(def.folderPath.c_str());
+    DWORD ftyp = GetFileAttributesA(def.saveDataFolderPath.c_str());
     if (ftyp == INVALID_FILE_ATTRIBUTES || !(ftyp & FILE_ATTRIBUTE_DIRECTORY)) {
-        std::cout << "Save directory doesn't exist. Creating: " << def.folderPath << std::endl;
-        if (!CreateDirectoryA(def.folderPath.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS) {
+        std::cout << "Save directory doesn't exist. Creating: " << def.saveDataFolderPath << std::endl;
+        if (!CreateDirectoryA(def.saveDataFolderPath.c_str(), NULL) && GetLastError() != ERROR_ALREADY_EXISTS) {
             std::cerr << "Failed to create directory! Error Code: " << GetLastError() << std::endl;
         }
     }
@@ -74,7 +74,7 @@ void Mod::Music(const char* mp3File, bool playstop) {
 
 ///Loads game data
 void Mod::HandleLoad() {
-    std::ifstream loadFile(def.saveFilePath);
+    std::ifstream loadFile(def.saveFile);
     if (loadFile.is_open()) {
         std::string line;
         if (getline(loadFile, line)) def.money = std::stoi(line);
@@ -94,7 +94,7 @@ void Mod::HandleLoad() {
 
 ///Saves game data
 void Mod::HandleSave() {
-    std::ofstream saveFile(def.saveFilePath, std::ios::out | std::ios::trunc);
+    std::ofstream saveFile(def.saveFile, std::ios::out | std::ios::trunc);
     if (saveFile.is_open()) {
         saveFile << def.money << "\n" << def.points << "\n" << def.taxamount << "\n" << def.secretonefound << "\n" << def.secrettwofound << "\n" << def.csamount << "\n" << def.inprison << std::endl;
     }

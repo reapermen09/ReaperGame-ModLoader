@@ -15,14 +15,16 @@ public:
     bool begging = false;
     long money = 10;
     long points = 0;
+    bool prisonSession = false;
     long csRqToGoToPrison = 15;
     std::string command;
     const std::string developerName = "Reaper";
     const std::string developerExName = "Reaperman";
-    std::string folderPath = "C:\\ReaperGame\\SaveData";
-    std::string saveFilePath = folderPath + "\\game_save.txt";
-    std::string settingsFilePath = folderPath + "\\settings.txt";
-    std::string achievementsFilePath = folderPath + "\\achievements.txt";
+    std::string saveDataFolderPath = "C:\\ReaperGame\\SaveData";
+    std::string assetsFolderPath = "C:\\ReaperGame\\Assets";
+    std::string saveFile = saveDataFolderPath + "\\game_save.txt";
+    std::string settingsFile = saveDataFolderPath + "\\settings.txt";
+    std::string achievementsFile = saveDataFolderPath + "\\achievements.txt";
     const std::string reaperGameEdition = "You are using C++ RgModLoader Edition";
 
     bool money100 = false;

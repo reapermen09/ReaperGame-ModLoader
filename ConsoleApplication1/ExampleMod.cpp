@@ -20,7 +20,7 @@ void ExampleMod::ModifyAttributes() {
         if (inboss && beatReaper)
         {
             def.money += 10000;
-            std::ofstream saveFile(def.saveFilePath, std::ios::out | std::ios::trunc);
+            std::ofstream saveFile(def.saveFile, std::ios::out | std::ios::trunc);
             if (saveFile.is_open()) {
                 saveFile << def.money << "\n" << def.points << "\n" << def.taxamount << "\n" << def.secretonefound << "\n" << def.secrettwofound << "\n" << def.csamount << "\n" << def.inprison << std::endl;
             }

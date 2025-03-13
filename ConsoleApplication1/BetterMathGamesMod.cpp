@@ -3,9 +3,18 @@
 #include <sstream>
 #include <string>
 #include "Defaults.h"
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <cmath>
+#include <limits>
 
-#undef max;
-BetterMathGamesMod::BetterMathGamesMod() { CheckEnable(def.modSet[1]); }
+#undef max
+
+BetterMathGamesMod::BetterMathGamesMod() {
+    std::srand(static_cast<unsigned>(std::time(nullptr)));
+    CheckEnable(def.modSet[1]);
+}
 
 void BetterMathGamesMod::ModifyAttributes() {
     if (!modEnabled) {
@@ -13,6 +22,7 @@ void BetterMathGamesMod::ModifyAttributes() {
         return;
     }
 }
+
 void BetterMathGamesMod::CommandList()
 {
     if (modEnabled) {
@@ -23,13 +33,16 @@ void BetterMathGamesMod::CommandList()
 
 bool BetterMathGamesMod::CommandUsed()
 {
-     if (def.command == "/playmath")
-     {
+    if (def.command == "/playmath")
+    {
         Load();
         return true;
-     }
-     else return false;
+    }
+    else {
+        return false;
+    }
 }
+
 double CalculateTriangleArea(double base, double height) {
     return 0.5 * base * height;
 }
@@ -39,7 +52,7 @@ double CalculateSquareArea(double side) {
 }
 
 double FindMissingSide(double sideA, double sideB) {
-    return sqrt(sideA * sideA + sideB * sideB);
+    return std::sqrt(sideA * sideA + sideB * sideB);
 }
 
 void ArithmeticOperations(int minRandom, int maxRandom) {
@@ -78,14 +91,11 @@ void ArithmeticOperations(int minRandom, int maxRandom) {
         std::cout << "What is " << num1 << " * " << num2 << "? ";
         break;
     case 4:
-        if (num2 != 0) {
-            correctAnswer = static_cast<double>(num1) / num2;
-            std::cout << "What is " << num1 << " / " << num2 << "? ";
+        while (num2 == 0) {
+            num2 = rand() % (maxRandom - minRandom + 1) + minRandom;
         }
-        else {
-            std::cout << "Division by zero is not allowed! Please try again." << std::endl;
-            return;
-        }
+        correctAnswer = static_cast<double>(num1) / num2;
+        std::cout << "What is " << num1 << " / " << num2 << "? ";
         break;
     }
 
@@ -100,9 +110,9 @@ void ArithmeticOperations(int minRandom, int maxRandom) {
 
     if (std::abs(userAnswer - correctAnswer) < 0.01) {
         std::cout << "Correct! The answer is indeed " << correctAnswer << ".\n";
-        def.money += abs(ceil(num2 / 4)) + 1;
-        std::cout << "Your money increased by " << ceil(1 + (num2/4)) << std::endl;
-        double tax = abs(ceil(num2 / 8));
+        def.money += std::abs(std::ceil(num2 / 4.0)) + 1;
+        std::cout << "Your money increased by " << std::ceil(1 + (num2 / 4.0)) << std::endl;
+        double tax = std::abs(std::ceil(num2 / 8.0));
         def.taxamount += static_cast<long>(tax);
         def.csamount += 1;
     }
@@ -112,8 +122,6 @@ void ArithmeticOperations(int minRandom, int maxRandom) {
 }
 
 void PlayGame() {
-    std::srand(static_cast<unsigned>(std::time(nullptr)));
-
     char playAgain = 'y';
 
     while (playAgain == 'y' || playAgain == 'Y') {
@@ -124,13 +132,13 @@ void PlayGame() {
         std::cout << "3. Solve for a side of a right triangle\n";
         std::cout << "4. Perform arithmetic operations\n";
         std::cout << "5. Exit Math Game\n";
-        std::cout << "Enter your choice (1-4): ";
+        std::cout << "Enter your choice (1-5): ";
         std::cin >> choice;
 
-        while (std::cin.fail() || choice < 1 || choice > 4) {
+        while (std::cin.fail() || choice < 1 || choice > 5) {
             std::cin.clear();
             std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-            std::cout << "Invalid choice! Please select between 1-4: ";
+            std::cout << "Invalid choice! Please select between 1-5: ";
             std::cin >> choice;
         }
 
@@ -138,7 +146,6 @@ void PlayGame() {
         case 1: {
             double base = rand() % 100 + 1;
             double height = rand() % 100 + 1;
-
             double area = CalculateTriangleArea(base, height);
 
             std::cout << "Given a triangle with base = " << base << " and height = " << height << ", what is the area?\n";
@@ -154,9 +161,9 @@ void PlayGame() {
 
             if (std::abs(userArea - area) < 0.01) {
                 std::cout << "Correct! The area of the triangle is indeed " << area << ".\n";
-                def.money += abs(ceil(area / 4)) + 1;
-                std::cout << "Your money increased by " << abs(ceil(1 + (area / 4))) + 1 << std::endl;
-                double tax = abs(ceil(area / 9));
+                def.money += std::abs(std::ceil(area / 4.0)) + 1;
+                std::cout << "Your money increased by " << std::abs(std::ceil(1 + (area / 4.0))) + 1 << std::endl;
+                double tax = std::abs(std::ceil(area / 9.0));
                 def.taxamount += static_cast<long>(tax);
                 def.csamount += 1;
             }
@@ -167,7 +174,6 @@ void PlayGame() {
         }
         case 2: {
             double side = rand() % 100 + 1;
-
             double area = CalculateSquareArea(side);
 
             std::cout << "Given a square with side length = " << side << ", what is the area?\n";
@@ -183,9 +189,9 @@ void PlayGame() {
 
             if (std::abs(userArea - area) < 0.01) {
                 std::cout << "Correct! The area of the square is indeed " << area << ".\n";
-                def.money += abs(ceil(area / 3));
-                std::cout << "Your money increased by " << abs(ceil(1 + (area / 3))) + 1 << std::endl;
-                double tax = abs(ceil(area / 8));
+                def.money += std::abs(std::ceil(area / 3.0));
+                std::cout << "Your money increased by " << std::abs(std::ceil(1 + (area / 3.0))) + 1 << std::endl;
+                double tax = std::abs(std::ceil(area / 8.0));
                 def.taxamount += static_cast<long>(tax);
                 def.csamount += 1;
             }
@@ -197,10 +203,10 @@ void PlayGame() {
         case 3: {
             double sideA = rand() % 20 + 1;
             double sideB = rand() % 20 + 1;
-
             double hypotenuse = FindMissingSide(sideA, sideB);
 
-            std::cout << "If side A = " << sideA << " and side B = " << sideB << ", what is the value of the hypotenuse C (rounded to 2 decimal places)?\n";
+            std::cout << "If side A = " << sideA << " and side B = " << sideB
+                << ", what is the value of the hypotenuse C (rounded to 2 decimal places)?\n";
             double userHypotenuse;
             std::cin >> userHypotenuse;
 
@@ -213,9 +219,10 @@ void PlayGame() {
 
             if (std::abs(userHypotenuse - hypotenuse) < 0.01) {
                 std::cout << "Correct! The hypotenuse is indeed " << hypotenuse << ".\n";
-                def.money += abs(ceil(hypotenuse * 2.5)) + 1;
-                std::cout << "Your money increased by " << abs(ceil(1 + (hypotenuse * 2.5))) + 1 << std::endl;
-                double tax = abs(ceil(hypotenuse));
+                def.money += std::abs(std::ceil(hypotenuse * 2.5)) + 1;
+                std::cout << "Your money increased by "
+                    << std::abs(std::ceil(1 + (hypotenuse * 2.5))) + 1 << std::endl;
+                double tax = std::abs(std::ceil(hypotenuse));
                 def.taxamount += static_cast<long>(tax);
                 def.csamount += 1;
             }
@@ -235,14 +242,13 @@ void PlayGame() {
                 std::cout << "Invalid range. Minimum must be less than maximum." << std::endl;
                 break;
             }
-
             ArithmeticOperations(minRandom, maxRandom);
             break;
         }
-        case 5: break;
-
+        case 5:
+            return;
         default:
-            std::cout << "Invalid choice! Please select between 1-4." << std::endl;
+            std::cout << "Invalid choice! Please select between 1-5." << std::endl;
             break;
         }
 
@@ -265,7 +271,7 @@ void BetterMathGamesMod::Load()
 
 void BetterMathGamesMod::ModDescription()
 {
-    std::string nextLine[] = {
+    const std::string nextLine[] = {
         "This mod adds a new command called /playmath\n",
         "Adds Find the Area of a triangle\n",
         "Adds Find the Area of a square\n",
@@ -273,9 +279,10 @@ void BetterMathGamesMod::ModDescription()
         "Adds more and better arithmetic equations\n"
     };
 
-    for (const auto& line : nextLine)
+    const int size = sizeof(nextLine) / sizeof(nextLine[0]);
+    for (int i = 0; i < size; i++)
     {
-        std::cout << line << std::endl;
+        std::cout << nextLine[i] << std::endl;
     }
 }
 
