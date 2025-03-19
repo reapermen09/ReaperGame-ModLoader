@@ -2,15 +2,16 @@
 
 ## Downloads:
 
-### No Mods:
+### Non Mod Versions:
 
+https://github.com/reapermen09/ReaperGame-ModLoader/tree/master/Versions
 
-
-### Latest:
+### Latest ModLoader:
 
 v1.2.1: https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.2.1
 
-### Legacy:
+### Legacy ModLoader:
+
 v1.2 (Game) https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.2
 
 v1.1 (Game) https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.1
