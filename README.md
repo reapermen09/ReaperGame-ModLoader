@@ -2,9 +2,12 @@
 
 ## Downloads:
 ### Latest:
-v1.1 (Game) https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.1
 
-v1.1 (Assets) https://github.com/reapermen09/ReaperGame-ModLoader/tree/main/Assets
+v1.2.1: https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.2.1
+
+### Legacy:
+v1.1 (Game) https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.1
+(Assets) https://github.com/reapermen09/ReaperGame-ModLoader/tree/main/Assets
 
 ## Assets:
 1. You can find the Assets folder in https://github.com/reapermen09/ReaperGame-ModLoader/tree/main/Assets
