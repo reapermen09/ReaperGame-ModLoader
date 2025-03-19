@@ -6,7 +6,14 @@
 v1.2.1: https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.2.1
 
 ### Legacy:
+v1.2 (Game) https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.2
+
 v1.1 (Game) https://github.com/reapermen09/ReaperGame-ModLoader/releases/tag/v1.1
+
+
+
+Use this "Assets" for versions 1.2 and under:
+
 (Assets) https://github.com/reapermen09/ReaperGame-ModLoader/tree/main/Assets
 
 ## Assets:
